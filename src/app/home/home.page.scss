@@ -1,0 +1,104 @@
+#container {
+  text-align: center;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#container p {
+  font-size: 16px;
+  line-height: 22px;
+
+  color: #8c8c8c;
+
+  margin: 0;
+}
+
+#container a {
+  text-decoration: none;
+}
+
+ion-content {
+  .body {
+    // Top mood stuff
+    .top-swipe-buttons {
+      overflow: visible;
+
+      .mood {
+      width: 100px; /* Set a consistent width */
+      height: 30px; /* Set a consistent height */
+      --background: rgba(113, 113, 113, 0.2);
+      color: #bbbbbb; /* Text color */
+      font-weight: bold;
+      border-radius: 15px; /* Rounded corners */
+      text-align: center;
+      line-height: 30px; /* Vertically center text */
+      border: none; /* Remove border */
+      transition: background 0.3s ease; /* Smooth hover effect */
+      }
+
+      .mood:hover {
+        background: rgba(255, 98, 98, 0.8); /* Slightly less translucent on hover */
+      }
+    }
+
+    // Quick picks 
+    .quick-picks-portion {
+      margin-top: 25px;
+
+      .quick-song-pick {
+        --background: transparent;
+        --box-shadow: none;
+        width: 100%;
+        height: auto;
+        padding: 0;
+      }
+
+      ion-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 60px; 
+        --background: transparent;
+      }
+
+      ion-label {
+        margin-left: 10px;
+        font-size: 14px
+
+        h4 {
+          font-size: 16px;
+          margin: 0;
+          font-weight: bold;
+        }
+
+        p {
+          font-size: 12px;
+          margin: 0;
+          color: #888;  
+        }
+      }
+    }
+  }
+}
+
+.swiper-container {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

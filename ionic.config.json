@@ -1,0 +1,7 @@
+{
+  "name": "MusicStreamerApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
