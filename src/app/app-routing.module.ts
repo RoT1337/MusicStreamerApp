@@ -10,7 +10,11 @@ const routes: Routes = [
     path: '',
     redirectTo: 'tabs/home',
     pathMatch: 'full'
+  },  {
+    path: 'callback',
+    loadChildren: () => import('./callback/callback.module').then( m => m.CallbackPageModule)
   }
+
 ];
 
 @NgModule({

@@ -11,8 +11,12 @@
         <ion-button>
           <ion-icon name="search-outline"></ion-icon>
         </ion-button>
-        <ion-button>
-          <ion-icon name="person-outline"></ion-icon>
+        <ion-button (click)="login()">
+          <div *ngIf="!userProfileImage">
+            <ion-icon name="person-outline"></ion-icon>
+            Log In
+          </div>
+          <img *ngIf="userProfileImage" [src]="userProfileImage" alt="User Profile" style="width: 32px; height: 32px; border-radius: 50%;" />
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
@@ -229,67 +233,15 @@
         space-between="10"
         free-mode="true"
       >
-        <swiper-slide>
+        <swiper-slide *ngFor="let playlist of userPlaylists">
           <ion-button class="saved-playlist">
             <div class="playlist-content">
               <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-plagiarism-album.png" alt="your playlist 1">
+                <img [src]="playlist.images?.[0]?.url" [alt]="playlist.name" />
               </ion-thumbnail>
               <ion-label>
-                <h4>J-Poppers</h4>
-                <p>Rovultion</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-haru.jpg" alt="your playlist 2">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Different</h4>
-                <p>Roi</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-magiclantern-album.jpeg" alt="your playlist 3">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Moody</h4>
-                <p>Blues</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-matasaburo.jpg" alt="your playlist 4">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Sol</h4>
-                <p>Rovultion</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-plagiarism-album.png" alt="your playlist 1">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>J-Poppers</h4>
-                <p>Rovultion</p>
+                <h4>{{ playlist.name }}</h4>
+                <p>{{ playlist.owner.display_name }}</p>
               </ion-label>
             </div>
           </ion-button>
@@ -372,6 +324,5 @@
         </swiper-slide>
       </swiper-container>
     </div>
-
   </div>  
 </ion-content>
