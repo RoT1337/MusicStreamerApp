@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
+import { Browser } from '@capacitor/browser';
 
 @Injectable({
   providedIn: 'root'
@@ -74,7 +75,7 @@ export class SpotifyService {
     }
   }
 
-  login() {
+  async login() {
     const scopes = [
       'playlist-read-private',
       'playlist-read-collaborative',
@@ -89,7 +90,9 @@ export class SpotifyService {
 
     const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${scopes.join('%20')}&redirect_uri=${redirectUri}`;
 
-    window.location.href = authUrl; // Spotify Login Page (Authorize)
+    // window.location.href = authUrl; // Spotify Login Page (Authorize)
+    
+    await Browser.open({ url: authUrl });
   }
 
   async getUserProfile(): Promise<any> {
