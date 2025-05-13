@@ -1,5 +1,5 @@
-<ion-content [fullscreen]="true">
-  <div class="header">
+<ion-header>
+  <div class="header primary-bg">
     <ion-toolbar style="padding-top: 25px; --background: transparent;">
       <ion-title>
         <ion-icon name="play-outline"></ion-icon> BeaM
@@ -21,7 +21,9 @@
       </ion-buttons>
     </ion-toolbar>
   </div>
+</ion-header>
 
+<ion-content [fullscreen]="true">
   <div class="body ion-padding">
 
     <!-- Top buttons for moods -->
@@ -63,162 +65,24 @@
     <!-- Quick picks portion -->
     <div class="quick-picks-portion">
       <h3>Quick Picks</h3>
-      <swiper-container
-        slides-per-view="1.2"
+      <swiper-container 
+        slides-per-view="1.2" 
         space-between="15"
+        [grid]="{ rows: 4, fill: 'row' }"
       >
-        <!-- First swiper-slide with 4 buttons -->
-        <swiper-slide>
-          <ion-button class="quick-song-pick" fill="clear">
+        <swiper-slide *ngFor="let track of quickPicks">
+          <ion-button class="quick-song-pick" fill="clear" (click)="playSong(track.uri)">
             <ion-item lines="none">
               <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-haru.jpg" alt="Yorushika Sunny" />
+                <img [src]="track.album.images[0]?.url" [alt]="track.name" />
               </ion-thumbnail>
               <ion-label>
-                <h4>Sunny</h4>
-                <p>Yorushika</p>
+                <h4>{{ track.name }}</h4>
+                <p>{{ track.artists[0]?.name }}</p>
               </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-matasaburo.jpg" alt="Yorushika Matasaburo" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Matasaburo</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-magiclantern-album.jpeg" alt="Yorushika Lantern" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Lantern</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-plagiarism-album.png" alt="Yorushika Flower" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Flower</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-        </swiper-slide>
-
-        <!-- Second swiper-slide with 4 buttons -->
-        <swiper-slide>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-haru.jpg" alt="Yorushika Sunny" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Sunny</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-matasaburo.jpg" alt="Yorushika Matasaburo" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Matasaburo</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-magiclantern-album.jpeg" alt="Yorushika Lantern" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Lantern</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-plagiarism-album.png" alt="Yorushika Flower" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Flower</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-        </swiper-slide>
-
-        <!-- Third swiper-slide with 4 buttons -->
-        <swiper-slide>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-haru.jpg" alt="Yorushika Sunny" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Sunny</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-matasaburo.jpg" alt="Yorushika Matasaburo" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Matasaburo</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-magiclantern-album.jpeg" alt="Yorushika Lantern" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Lantern</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
-            </ion-item>
-          </ion-button>
-          <ion-button class="quick-song-pick" fill="clear">
-            <ion-item lines="none">
-              <ion-thumbnail slot="start">
-                <img src="assets/quick-picks-pics/yorushika-plagiarism-album.png" alt="Yorushika Flower" />
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Flower</h4>
-                <p>Yorushika</p>
-              </ion-label>
-              <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
+              <ion-button class="ellipsis-btn" fill="clear">
+                <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
+              </ion-button>
             </ion-item>
           </ion-button>
         </swiper-slide>
@@ -324,5 +188,6 @@
         </swiper-slide>
       </swiper-container>
     </div>
-  </div>  
+  </div>
+  <app-player [trackUri]="'spotify:track:76kJA3LUe1uREGjlaOypkL'"></app-player>  
 </ion-content>

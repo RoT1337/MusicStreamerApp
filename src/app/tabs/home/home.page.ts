@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SpotifyService } from 'src/app/services/spotify.service';
 
 @Component({
@@ -18,11 +19,29 @@ export class HomePage implements OnInit{
   userProfileImage: string = '';
   userPlaylists: any[] = [];
 
-  constructor(private spotifyService: SpotifyService) {}
+  // Song variables
+  quickPicks: any[] = [];
+  selectedTrackUri: string = '';
+
+  // HTML
+  hideHeader = false;
+  lastScrollTop = 0;
+
+  constructor(
+    private spotifyService: SpotifyService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-      this.loadUserProfile();
-      this.loadCurrentUserPlaylists();
+    const token = localStorage.getItem('spotifyAccessToken');
+    if (!token) {
+      this.router.navigate(['/start']);
+      return;
+    }
+
+    this.loadUserProfile();
+    this.loadCurrentUserPlaylists();
+    this.loadQuickPicks();
   }
 
   async loadUserProfile() {
@@ -40,6 +59,39 @@ export class HomePage implements OnInit{
     } catch (error) {
       console.error('Error loading user playlists:', error);
     }
+  }
+
+  async loadQuickPicks() {
+    try {
+      const topArtists = await this.spotifyService.getUserTopArtists();
+      let quickPicks: any[] = [];
+      for (const artist of topArtists) {
+        const tracks = await this.spotifyService.searchTracksByArtist(artist.name);
+        quickPicks = quickPicks.concat(tracks);
+      }
+      // Remove duplicates by track id
+      this.quickPicks = quickPicks.filter(
+        (track, index, self) => index === self.findIndex(t => t.id === track.id)
+      ).slice(0, 12); // Limit to 12 tracks for display
+    } catch (error) {
+      console.error('Error loading quick picks:', error);
+    }
+  }
+
+  // onScroll(event: any) {
+  //   const scrollTop = event.detail.scrollTop;
+  //   if (scrollTop > this.lastScrollTop && scrollTop > 50) {
+  //     this.hideHeader = true; // scrolling down, hide header
+  //   } else {
+  //     this.hideHeader = false; // scrolling up, show header
+  //   }
+  //   this.lastScrollTop = scrollTop;
+  // }
+
+  playSong(uri: string) {
+    console.log('Selected track URI:', uri);
+    // this.selectedTrackUri = uri;
+    this.router.navigate(['/player', encodeURIComponent(uri)]);
   }
 
   login() {

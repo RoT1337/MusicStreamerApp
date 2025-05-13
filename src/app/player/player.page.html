@@ -1,0 +1,16 @@
+<ion-content>
+  <div class="player-controls">
+    <ion-button (click)="previous()">
+      <ion-icon name="play-skip-back"></ion-icon>
+    </ion-button>
+    <ion-button *ngIf="!isPlaying" (click)="play()">
+      <ion-icon name="play"></ion-icon>
+    </ion-button>
+    <ion-button *ngIf="isPlaying" (click)="pause()">
+      <ion-icon name="pause"></ion-icon>
+    </ion-button>
+    <ion-button (click)="next()">
+      <ion-icon name="play-skip-forward"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

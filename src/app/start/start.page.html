@@ -1,0 +1,38 @@
+<ion-header>
+  <div class="header primary-bg">
+    <ion-toolbar style="padding-top: 25px; --background: transparent;">
+      <ion-title>
+        <ion-icon name="play-outline"></ion-icon> BeaM
+      </ion-title>
+    </ion-toolbar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="body">
+    <section class="primary-bg center-content">
+      <h3>A new way to enjoy your songs!</h3>
+    </section>
+    <section class="secondary-bg center-content">
+      <h3>Why BeaM?</h3>
+      <div class="reasons-row">
+        <div class="reason">
+          <h4>Simplicity</h4>
+          <p>Get your songs here!</p>
+        </div>
+        <div class="reason">
+          <h4>AI Powered</h4>
+          <p>Get recommended songs faster!</p>
+        </div>
+        <div class="reason">
+          <h4>Fast</h4>
+          <p>Efficient!</p>
+        </div>
+      </div>
+    </section>
+    <section class="primary-bg center-content">
+      <h3>Log into your Spotify account!</h3>
+      <ion-button class="circle-login-btn" (click)="login()">Log In</ion-button>
+    </section>
+  </div>
+</ion-content>
