@@ -9,13 +9,14 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { PlayerComponent } from './components/player/player.component';
 
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, PlayerComponent],
   imports: [
     BrowserModule, 
     BrowserAnimationsModule,

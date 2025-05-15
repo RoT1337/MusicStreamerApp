@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { PlayerService } from 'src/app/services/player.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
 
 @Component({
@@ -23,13 +24,17 @@ export class HomePage implements OnInit{
   quickPicks: any[] = [];
   selectedTrackUri: string = '';
 
+  // Album variables
+  quickPickAlbums: any[] = [];
+
   // HTML
   hideHeader = false;
   lastScrollTop = 0;
 
   constructor(
     private spotifyService: SpotifyService,
-    private router: Router
+    private router: Router,
+    private playerService: PlayerService
   ) {}
 
   ngOnInit(): void {
@@ -42,6 +47,7 @@ export class HomePage implements OnInit{
     this.loadUserProfile();
     this.loadCurrentUserPlaylists();
     this.loadQuickPicks();
+    this.loadQuickPickAlbums();
   }
 
   async loadUserProfile() {
@@ -78,20 +84,36 @@ export class HomePage implements OnInit{
     }
   }
 
-  // onScroll(event: any) {
-  //   const scrollTop = event.detail.scrollTop;
-  //   if (scrollTop > this.lastScrollTop && scrollTop > 50) {
-  //     this.hideHeader = true; // scrolling down, hide header
-  //   } else {
-  //     this.hideHeader = false; // scrolling up, show header
-  //   }
-  //   this.lastScrollTop = scrollTop;
-  // }
+  async loadQuickPickAlbums() {
+    try {
+      // Get top artists for both short and long term
+      const shortTermArtists = await this.spotifyService.getUserTopArtists('short_term');
+      const longTermArtists = await this.spotifyService.getUserTopArtists('long_term');
+      const allArtists = [...shortTermArtists, ...longTermArtists];
+
+      let albums: any[] = [];
+      for (const artist of allArtists) {
+        const artistAlbums = await this.spotifyService.getArtistAlbums(artist.id);
+        albums = albums.concat(artistAlbums);
+      }
+
+      // Remove duplicate albums by id
+      this.quickPickAlbums = albums.filter(
+        (album, index, self) => index === self.findIndex(a => a.id === album.id)
+      ).slice(0, 12); // Limit for display
+    } catch (error) {
+      console.error('Error loading quick pick albums:', error);
+    }
+  }
+
+  openAlbum(albumId: string) {
+    this.router.navigate(['tabs/album', albumId]);
+  }
 
   playSong(uri: string) {
     console.log('Selected track URI:', uri);
-    // this.selectedTrackUri = uri;
-    this.router.navigate(['/player', encodeURIComponent(uri)]);
+    this.playerService.setTrackUri(uri);
+    console.log('Variable track URI:', this.selectedTrackUri);
   }
 
   login() {

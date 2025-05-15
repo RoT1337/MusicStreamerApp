@@ -1,6 +1,40 @@
+.player-bar {
+  --background: transparent;
+  align-items: center;
+  min-height: 64px;
+}
+
+ion-thumbnail {
+  --size: 48px;
+  margin-right: 12px;
+}
+
+ion-label {
+  .track-title {
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .track-artist {
+    font-size: 13px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .player-controls {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
+
+// .player-controls {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   gap: 16px;
+// }

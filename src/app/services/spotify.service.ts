@@ -80,6 +80,8 @@ export class SpotifyService {
       'playlist-read-private',
       'playlist-read-collaborative',
       'user-top-read',
+      'user-read-email',
+      'user-read-private',
       'user-read-playback-state',
       'user-modify-playback-state',
       'user-read-currently-playing',
@@ -138,13 +140,34 @@ export class SpotifyService {
     }
   }
 
-  async getUserTopArtists(): Promise<any[]> {
+  // Get user's top artists for a given time range
+  async getUserTopArtists(time_range: 'short_term' | 'long_term' = 'short_term'): Promise<any[]> {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
     const response: any = await firstValueFrom(
-      this.http.get('https://api.spotify.com/v1/me/top/artists?limit=3', { headers })
+      this.http.get(`https://api.spotify.com/v1/me/top/artists?limit=5&time_range=${time_range}`, { headers })
     );
     return response.items;
+  }
+
+  // Get albums for an artist
+  async getArtistAlbums(artistId: string): Promise<any[]> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    const response: any = await firstValueFrom(
+      this.http.get(`https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album,single&limit=5`, { headers })
+    );
+    return response.items;
+  }
+
+  // Search for albums
+  async searchAlbums(query: string): Promise<any[]> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    const response: any = await firstValueFrom(
+      this.http.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=album&limit=10`, { headers })
+    );
+    return response.albums.items;
   }
 
   async searchTracksByArtist(artistName: string): Promise<any[]> {
@@ -157,6 +180,45 @@ export class SpotifyService {
       )
     );
     return response.tracks.items;
+  }
+
+  async getTrackInfo(trackUri: string): Promise<any> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    if (!accessToken) {
+      throw new Error('Access token not found. Please log in.');
+    }
+
+    // Extract the track ID from the URI (format: "spotify:track:TRACK_ID")
+    let trackId = trackUri;
+    if (trackUri.startsWith('spotify:track:')) {
+      trackId = trackUri.split(':')[2];
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${accessToken}`,
+    });
+
+    try {
+      const response: any = await firstValueFrom(
+        this.http.get(`https://api.spotify.com/v1/tracks/${trackId}`, { headers })
+      );
+      return response;
+    } catch (error) {
+      console.error('Error fetching track info:', error);
+      throw error;
+    }
+  }
+
+  async getAlbumInfo(albumId: string): Promise<any> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    return firstValueFrom(this.http.get(`https://api.spotify.com/v1/albums/${albumId}`, { headers }));
+  }
+
+  async getPlaylistInfo(playlistId: string): Promise<any> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    return firstValueFrom(this.http.get(`https://api.spotify.com/v1/playlists/${playlistId}`, { headers }));
   }
 
   async playTrack(trackUri: string, deviceId: string): Promise<void> {

@@ -8,9 +8,6 @@
         <ion-button>
           <ion-icon name="notifications-outline"></ion-icon>
         </ion-button>
-        <ion-button>
-          <ion-icon name="search-outline"></ion-icon>
-        </ion-button>
         <ion-button (click)="login()">
           <div *ngIf="!userProfileImage">
             <ion-icon name="person-outline"></ion-icon>
@@ -30,8 +27,7 @@
     <div class="top-swipe-buttons">
       <swiper-container 
         space-between="10" 
-        slides-per-view="auto" 
-        loop="true"
+        slides-per-view="auto"
         free-mode="true"
         [breakpoints]="breakpoints"
       >
@@ -84,6 +80,34 @@
                 <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
               </ion-button>
             </ion-item>
+          </ion-button>
+        </swiper-slide>
+      </swiper-container>
+    </div>
+
+    <!-- Recommended Albums -->
+    <div class="quick-pick-albums-portion">
+      <h3>Recommended Albums</h3>
+      <swiper-container
+        slides-per-view="2.2"
+        space-between="10"
+        free-mode="true"
+      >
+        <swiper-slide *ngFor="let album of quickPickAlbums">
+          <ion-button class="saved-playlist" (click)="openAlbum(album.id)">
+            <div class="playlist-content">
+              <ion-thumbnail class="saved-playlist-thumbnail">
+                <img [src]="album.images?.[0]?.url" [alt]="album.name" />
+              </ion-thumbnail>
+              <ion-label>
+                <h4>{{ album.name }}</h4>
+                <p>
+                  <span *ngFor="let artist of album.artists; let last = last">
+                    {{ artist.name }}<span *ngIf="!last">, </span>
+                  </span>
+                </p>
+              </ion-label>
+            </div>
           </ion-button>
         </swiper-slide>
       </swiper-container>
@@ -189,5 +213,4 @@
       </swiper-container>
     </div>
   </div>
-  <app-player [trackUri]="'spotify:track:76kJA3LUe1uREGjlaOypkL'"></app-player>  
 </ion-content>

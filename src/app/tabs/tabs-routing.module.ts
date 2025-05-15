@@ -15,6 +15,14 @@ const routes: Routes = [
       {
         path: 'search',
         loadChildren: () => import('./search/search.module').then( m => m.SearchPageModule)
+      },    
+      {
+        path: 'album/:id',
+        loadChildren: () => import('./album-details/album-details.module').then( m => m.AlbumDetailsPageModule)
+      },
+      {
+        path: 'playlist/:id',
+        loadChildren: () => import('./playlist-details/playlist-details.module').then( m => m.PlaylistDetailsPageModule)
       },
     ],
   },

@@ -4,6 +4,7 @@ import { App } from '@capacitor/app';
 import { SpotifyService } from './services/spotify.service';
 import { Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
+import { PlayerService } from './services/player.service';
 
 register();
 
@@ -14,7 +15,15 @@ register();
   standalone: false,
 })
 export class AppComponent {
-  constructor(private spotifyService: SpotifyService, private router: Router) {
+  selectedTrackUri: string | null = null;
+
+  constructor(
+    private spotifyService: SpotifyService, 
+    private router: Router,
+    private playerService: PlayerService
+  ) {
+    playerService.trackUri$.subscribe(uri => this.selectedTrackUri = uri);
+    
     App.addListener('appUrlOpen', async (data: any) => {
       if (data.url && data.url.startsWith('beam://callback')) {
         const url = new URL(data.url);

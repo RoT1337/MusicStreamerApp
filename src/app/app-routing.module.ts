@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { PlayerPage } from './player/player.page';
 
 const routes: Routes = [
   {
@@ -19,14 +18,6 @@ const routes: Routes = [
   {
     path: 'start',
     loadChildren: () => import('./start/start.module').then( m => m.StartPageModule)
-  },
-  {
-    path: 'player',
-    loadChildren: () => import('./player/player.module').then( m => m.PlayerPageModule)
-  },
-  {
-    path: 'player/:trackUri',
-    component: PlayerPage
   },
 ];
 

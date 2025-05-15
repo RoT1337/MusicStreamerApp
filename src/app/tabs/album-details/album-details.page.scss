@@ -1,0 +1,80 @@
+.album-back-btn {
+  padding-top: 25px;
+  padding-left: 12px;
+  font-size: 28px;
+  color: var(--ion-color-primary, #222);
+  cursor: pointer;
+  width: fit-content;
+}
+
+.album-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 16px;
+
+  .album-art {
+    --size: 180px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .album-info {
+    text-align: center;
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .album-artists {
+      color: #888;
+      font-size: 1rem;
+    }
+  }
+}
+
+.album-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 16px 16px 16px;
+
+  .left-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .right-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    .play-btn {
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.track-thumb {
+  --size: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.track-title {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.track-artists {
+  color: #888;
+  font-size: 0.9rem;
+}

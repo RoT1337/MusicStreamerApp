@@ -1,0 +1,13 @@
+.app-player-global {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.48); 
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  backdrop-filter: blur(8px);
+  margin-left: 12px;
+  margin-right: 12px;
+  border-radius: 12px;
+}

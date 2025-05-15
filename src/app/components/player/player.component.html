@@ -1,14 +1,25 @@
 <div class="player-controls">
-  <ion-button (click)="previous()">
-    <ion-icon name="play-skip-back"></ion-icon>
-  </ion-button>
-  <ion-button *ngIf="!isPlaying" (click)="play()">
-    <ion-icon name="play"></ion-icon>
-  </ion-button>
-  <ion-button *ngIf="isPlaying" (click)="pause()">
-    <ion-icon name="pause"></ion-icon>
-  </ion-button>
-  <ion-button (click)="next()">
-    <ion-icon name="play-skip-forward"></ion-icon>
-  </ion-button>
+  <ion-item lines="none" class="player-bar">
+    <ion-thumbnail slot="start" *ngIf="trackImage">
+      <img [src]="trackImage" [alt]="trackName" />
+    </ion-thumbnail>
+    <ion-label>
+      <div class="track-title">{{ trackName }}</div>
+      <div class="track-artist">{{ trackArtist }}</div>
+    </ion-label>
+    <ion-buttons slot="end" class="player-controls">
+      <ion-button fill="clear" (click)="previous()">
+        <ion-icon name="play-skip-back"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" *ngIf="!isPlaying" (click)="play()">
+        <ion-icon name="play"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" *ngIf="isPlaying" (click)="pause()">
+        <ion-icon name="pause"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="next()">
+        <ion-icon name="play-skip-forward"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-item>
 </div>

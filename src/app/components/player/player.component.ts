@@ -1,56 +1,54 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { SpotifyService } from 'src/app/services/spotify.service';
-import { 
-  IonButton,
-  IonIcon
-} from '@ionic/angular';
-
-import { addIcons } from 'ionicons';
-import { play, pause, playSkipBack, playSkipForward } from 'ionicons/icons';
-
-declare global {
-  interface Window { onSpotifyWebPlaybackSDKReady: any; Spotify: any; }
-}
 
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
   styleUrls: ['./player.component.scss'],
-  imports: [
-    IonButton,
-    IonIcon
-  ]
+  standalone: false
 })
-export class PlayerComponent implements OnInit{
+export class PlayerComponent implements OnInit, OnChanges {
   @Input() trackUri: string = '';
+  @Input() trackName: string = '';
+  @Input() trackArtist: string = '';
+  @Input() trackImage: string = '';
   isPlaying = false;
   deviceId: string | null = null;
 
-  constructor(private spotifyService: SpotifyService) {
-    addIcons({ play, pause, playSkipBack, playSkipForward });
-  }
+  constructor(private spotifyService: SpotifyService) { }
 
   ngOnInit() {
-    const initPlayer = () => {
-      const token = localStorage.getItem('spotifyAccessToken');
-      const player = new (window as any).Spotify.Player({
-        name: 'BeaM Web Player',
-        getOAuthToken: (cb: any) => { cb(token); },
-        volume: 0.5
-      });
+    this.initPlayer();
+  }
 
-      player.addListener('ready', (e: any) => {
-        this.deviceId = e.device_id;
-      });
-
-      player.connect();
-    };
-
-    if ((window as any).Spotify) {
-      initPlayer();
-    } else {
-      (window as any).onSpotifyWebPlaybackSDKReady = initPlayer;
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['trackUri'] && this.trackUri) {
+      this.fetchTrackInfo();
     }
+  }
+
+  async fetchTrackInfo() {
+    if (this.trackUri) {
+      const track = await this.spotifyService.getTrackInfo(this.trackUri);
+      this.trackName = track.name;
+      this.trackArtist = track.artists[0]?.name;
+      this.trackImage = track.album.images[0]?.url;
+    }
+  }
+
+  initPlayer() {
+    const token = localStorage.getItem('spotifyAccessToken');
+    const player = new (window as any).Spotify.Player({
+      name: 'BeaM Player',
+      getOAuthToken: (cb: any) => { cb(token); },
+      volume: 0.5
+    });
+
+    player.addListener('ready', (e: any) => {
+      this.deviceId = e.device_id;
+    });
+
+    player.connect();
   }
 
   async play() {
