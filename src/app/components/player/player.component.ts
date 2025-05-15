@@ -12,8 +12,10 @@ export class PlayerComponent implements OnInit, OnChanges {
   @Input() trackName: string = '';
   @Input() trackArtist: string = '';
   @Input() trackImage: string = '';
+
   isPlaying = false;
   deviceId: string | null = null;
+  currentLoadedTrackUri: string | null = null;
 
   constructor(private spotifyService: SpotifyService) { }
 
@@ -46,6 +48,9 @@ export class PlayerComponent implements OnInit, OnChanges {
 
     player.addListener('ready', (e: any) => {
       this.deviceId = e.device_id;
+      if (this.deviceId) {
+        this.spotifyService.transferPlayback(this.deviceId);
+      }
     });
 
     player.connect();
@@ -53,8 +58,13 @@ export class PlayerComponent implements OnInit, OnChanges {
 
   async play() {
     if (this.trackUri && this.deviceId) {
-      await this.spotifyService.playTrack(this.trackUri, this.deviceId);
-      this.isPlaying = true;
+      if (this.currentLoadedTrackUri === this.trackUri) {
+        await this.resume();
+      } else {
+        await this.spotifyService.playTrack(this.trackUri, this.deviceId);
+        this.currentLoadedTrackUri = this.trackUri;
+        this.isPlaying = true;
+      }
     }
   }
 

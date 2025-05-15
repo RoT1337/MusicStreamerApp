@@ -22,7 +22,6 @@ export class HomePage implements OnInit{
 
   // Song variables
   quickPicks: any[] = [];
-  selectedTrackUri: string = '';
 
   // Album variables
   quickPickAlbums: any[] = [];
@@ -113,7 +112,6 @@ export class HomePage implements OnInit{
   playSong(uri: string) {
     console.log('Selected track URI:', uri);
     this.playerService.setTrackUri(uri);
-    console.log('Variable track URI:', this.selectedTrackUri);
   }
 
   login() {

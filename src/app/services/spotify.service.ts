@@ -221,6 +221,18 @@ export class SpotifyService {
     return firstValueFrom(this.http.get(`https://api.spotify.com/v1/playlists/${playlistId}`, { headers }));
   }
 
+  async transferPlayback(deviceId: string): Promise<void> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    await firstValueFrom(
+      this.http.put(
+        'https://api.spotify.com/v1/me/player',
+        { device_ids: [deviceId], play: true },
+        { headers, responseType: 'text' }
+      )
+    );
+  }
+
   async playTrack(trackUri: string, deviceId: string): Promise<void> {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     const headers = new HttpHeaders({
@@ -236,36 +248,46 @@ export class SpotifyService {
     );
   }
 
-async pausePlayback(): Promise<void> {
-  const accessToken = localStorage.getItem('spotifyAccessToken');
-  const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
-  await firstValueFrom(
-    this.http.put('https://api.spotify.com/v1/me/player/pause', {}, { headers })
-  );
-}
+  async pausePlayback(): Promise<void> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    await firstValueFrom(
+      this.http.put(
+        'https://api.spotify.com/v1/me/player/pause',
+        {},
+        { headers, responseType: 'text' } 
+      )
+    );
+  }
 
-async resumePlayback(): Promise<void> {
-  // Resume is just play with no body
-  const accessToken = localStorage.getItem('spotifyAccessToken');
-  const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
-  await firstValueFrom(
-    this.http.put('https://api.spotify.com/v1/me/player/play', {}, { headers })
-  );
-}
+  async resumePlayback(): Promise<void> {
+    // Resume is just play with no body
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    await firstValueFrom(
+      this.http.put('https://api.spotify.com/v1/me/player/play', 
+        {}, 
+        { headers, responseType: 'text' })
+    );
+  }
 
-async nextTrack(): Promise<void> {
-  const accessToken = localStorage.getItem('spotifyAccessToken');
-  const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
-  await firstValueFrom(
-    this.http.post('https://api.spotify.com/v1/me/player/next', {}, { headers })
-  );
-}
+  async nextTrack(): Promise<void> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    await firstValueFrom(
+      this.http.post('https://api.spotify.com/v1/me/player/next', 
+        {}, 
+        { headers, responseType: 'text' })
+    );
+  }
 
-async previousTrack(): Promise<void> {
-  const accessToken = localStorage.getItem('spotifyAccessToken');
-  const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
-  await firstValueFrom(
-    this.http.post('https://api.spotify.com/v1/me/player/previous', {}, { headers })
-  );
-}
+  async previousTrack(): Promise<void> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    await firstValueFrom(
+      this.http.post('https://api.spotify.com/v1/me/player/previous', 
+        {}, 
+        { headers, responseType: 'text' })
+    );
+  }
 }

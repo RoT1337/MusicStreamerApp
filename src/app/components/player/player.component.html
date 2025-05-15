@@ -11,11 +11,8 @@
       <ion-button fill="clear" (click)="previous()">
         <ion-icon name="play-skip-back"></ion-icon>
       </ion-button>
-      <ion-button fill="clear" *ngIf="!isPlaying" (click)="play()">
-        <ion-icon name="play"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" *ngIf="isPlaying" (click)="pause()">
-        <ion-icon name="pause"></ion-icon>
+      <ion-button fill="clear" (click)="isPlaying ? pause() : play()">
+        <ion-icon [name]="isPlaying ? 'pause' : 'play'"></ion-icon>
       </ion-button>
       <ion-button fill="clear" (click)="next()">
         <ion-icon name="play-skip-forward"></ion-icon>

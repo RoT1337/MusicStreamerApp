@@ -1,6 +1,10 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
 
+:root {
+  --ion-font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
 .primary-bg {
   background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
   color: #fff;
