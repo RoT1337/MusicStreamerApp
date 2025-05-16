@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { SpotifyService } from 'src/app/services/spotify.service';
 
 @Component({
@@ -7,15 +7,20 @@ import { SpotifyService } from 'src/app/services/spotify.service';
   styleUrls: ['./player.component.scss'],
   standalone: false
 })
-export class PlayerComponent implements OnInit, OnChanges {
+export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
   @Input() trackUri: string = '';
   @Input() trackName: string = '';
   @Input() trackArtist: string = '';
   @Input() trackImage: string = '';
 
+  playerInstance: any = null;
+
   isPlaying = false;
   deviceId: string | null = null;
   currentLoadedTrackUri: string | null = null;
+  currentPosition: number = 0;
+  duration: number = 0;
+  progressInterval: any;
 
   constructor(private spotifyService: SpotifyService) { }
 
@@ -26,6 +31,39 @@ export class PlayerComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['trackUri'] && this.trackUri) {
       this.fetchTrackInfo();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+    }
+  }
+
+  startProgressUpdater() {
+    this.progressInterval = setInterval(async () => {
+      if (this.playerInstance && this.deviceId) {
+        if (this.playerInstance.getCurrentState) {
+          const state = await this.playerInstance.getCurrentState();
+          console.log('Player state:', state);
+          if (state) {
+            this.currentPosition = state.position;
+            this.duration = state.duration;
+            this.isPlaying = !state.paused;
+          }
+        }
+      }
+    }, 1000);
+  }
+
+  async onSeek(event: any) {
+    const value = event.detail.value;
+    if (this.playerInstance && this.playerInstance.seek) {
+      await this.playerInstance.seek(value);
+      this.currentPosition = value;
+    } else if (this.deviceId) {
+      await this.spotifyService.seekToPosition(value, this.deviceId);
+      this.currentPosition = value;
     }
   }
 
@@ -46,10 +84,13 @@ export class PlayerComponent implements OnInit, OnChanges {
       volume: 0.5
     });
 
+    this.playerInstance = player;
+
     player.addListener('ready', (e: any) => {
       this.deviceId = e.device_id;
       if (this.deviceId) {
         this.spotifyService.transferPlayback(this.deviceId);
+        this.startProgressUpdater();
       }
     });
 
@@ -58,6 +99,7 @@ export class PlayerComponent implements OnInit, OnChanges {
 
   async play() {
     if (this.trackUri && this.deviceId) {
+      await this.spotifyService.transferPlayback(this.deviceId);
       if (this.currentLoadedTrackUri === this.trackUri) {
         await this.resume();
       } else {

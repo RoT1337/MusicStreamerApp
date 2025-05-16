@@ -233,6 +233,18 @@ export class SpotifyService {
     );
   }
 
+  async seekToPosition(positionMs: number, deviceId: string): Promise<void> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    await firstValueFrom(
+      this.http.put(
+        `https://api.spotify.com/v1/me/player/seek?position_ms=${positionMs}&device_id=${deviceId}`,
+        {},
+        { headers, responseType: 'text' }
+      )
+    );
+  }
+
   async playTrack(trackUri: string, deviceId: string): Promise<void> {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     const headers = new HttpHeaders({

@@ -20,3 +20,16 @@
     </ion-buttons>
   </ion-item>
 </div>
+<div class="player-progress">
+  <span class="current-time">{{ currentPosition | date:'mm:ss' }}</span>
+  <ion-range
+    min="0"
+    [max]="duration"
+    [value]="currentPosition"
+    (ionChange)="onSeek($event)"
+    [disabled]="!duration"
+    pin="true"
+    color="primary"
+  ></ion-range>
+  <span class="duration">{{ duration | date:'mm:ss' }}</span>
+</div>
