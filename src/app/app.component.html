@@ -1,6 +1,6 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
-  <div *ngIf="selectedTrackUri" class="app-player-global">
-    <app-player [trackUri]="selectedTrackUri"></app-player>  
+  <div *ngIf="shouldShowPlayer()" class="app-player-global">
+    <app-player [trackUri]="selectedTrackUri || ''"></app-player>  
   </div>
 </ion-app>

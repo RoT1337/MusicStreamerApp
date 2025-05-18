@@ -16,9 +16,21 @@ export class HomePage implements OnInit{
     1024: { spaceBetween: 20, slidesPerView: 4.2 },
   };
 
+  // Add song/track to playlist modal
+  addToPlaylistModalOpen = false;
+  addToPlaylistTrackUri: string | null = null;
+  selectedPlaylistsToAdd: Set<string> = new Set();
+
+  // Is section loading?
+  isLoadingQuickPicks = true;
+  isLoadingAlbums = true;
+  isLoadingPlaylists = true;
+  isLoadingRecentPlaylist = true;
+
   // Current user variables
   userProfileImage: string = '';
   userPlaylists: any[] = [];
+  recentPlaylists: any[] = [];
 
   // Song variables
   quickPicks: any[] = [];
@@ -48,6 +60,7 @@ export class HomePage implements OnInit{
     this.loadCurrentUserPlaylists();
     this.loadQuickPicks();
     this.loadQuickPickAlbums();
+    this.loadRecentPlaylists();
   }
 
   async loadUserProfile() {
@@ -59,15 +72,39 @@ export class HomePage implements OnInit{
     }
   }
 
+  async loadRecentPlaylists() {
+    this.isLoadingRecentPlaylist = true;
+    try {
+      // Get current user profile to get their user ID
+      const userProfile = await this.spotifyService.getUserProfile();
+      const myUserId = userProfile.id;
+
+      // Get all playlists (owned and followed)
+      const allPlaylists = await this.spotifyService.getUserPlaylists();
+
+      // Filter playlists where the owner is the current user
+      this.recentPlaylists = allPlaylists.filter((playlist: any) => playlist.owner.id === myUserId);
+    } catch (error) {
+      console.error('Error loading your playlists:', error);
+      this.recentPlaylists = [];
+    } finally {
+      this.isLoadingRecentPlaylist = false;
+    }
+  }
+
   async loadCurrentUserPlaylists() {
+    this.isLoadingPlaylists = true;
     try {
       this.userPlaylists = await this.spotifyService.getUserPlaylists();
     } catch (error) {
       console.error('Error loading user playlists:', error);
+    } finally {
+      this.isLoadingPlaylists = false;
     }
   }
 
   async loadQuickPicks() {
+    this.isLoadingQuickPicks = true;
     try {
       const topArtists = await this.spotifyService.getUserTopArtists();
       let quickPicks: any[] = [];
@@ -81,10 +118,13 @@ export class HomePage implements OnInit{
       ).slice(0, 12); // Limit to 12 tracks for display
     } catch (error) {
       console.error('Error loading quick picks:', error);
+    } finally {
+      this.isLoadingQuickPicks = false;
     }
   }
 
   async loadQuickPickAlbums() {
+    this.isLoadingAlbums = true;
     try {
       // Get top artists for both short and long term
       const shortTermArtists = await this.spotifyService.getUserTopArtists('short_term');
@@ -103,6 +143,8 @@ export class HomePage implements OnInit{
       ).slice(0, 12); // Limit for display
     } catch (error) {
       console.error('Error loading quick pick albums:', error);
+    } finally {
+      this.isLoadingAlbums = false;
     }
   }
 
@@ -119,5 +161,33 @@ export class HomePage implements OnInit{
 
   login() {
     this.spotifyService.login();
+  }
+
+  openAddToPlaylistModal(trackUri: string) {
+    this.addToPlaylistTrackUri = trackUri;
+    this.selectedPlaylistsToAdd = new Set();
+    this.addToPlaylistModalOpen = true;
+  }
+
+  closeAddToPlaylistModal() {
+    this.addToPlaylistModalOpen = false;
+    this.addToPlaylistTrackUri = null;
+    this.selectedPlaylistsToAdd.clear();
+  }
+
+  togglePlaylistSelection(playlistId: string) {
+    if (this.selectedPlaylistsToAdd.has(playlistId)) {
+      this.selectedPlaylistsToAdd.delete(playlistId);
+    } else {
+      this.selectedPlaylistsToAdd.add(playlistId);
+    }
+  }
+
+  async addTrackToSelectedPlaylists() {
+    if (!this.addToPlaylistTrackUri) return;
+    for (const playlistId of this.selectedPlaylistsToAdd) {
+      await this.spotifyService.addTrackToPlaylist(playlistId, this.addToPlaylistTrackUri);
+    }
+    this.closeAddToPlaylistModal();
   }
 }

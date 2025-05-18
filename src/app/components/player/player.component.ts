@@ -10,7 +10,7 @@ import { PlayerService } from 'src/app/services/player.service';
   standalone: false
 })
 export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() trackUri: string = '';
+  @Input() trackUri: string | null = null;
   @Input() trackName: string = '';
   @Input() trackArtist: string = '';
   @Input() trackImage: string = '';

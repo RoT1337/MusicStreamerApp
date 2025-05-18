@@ -79,13 +79,16 @@ export class SpotifyService {
     const scopes = [
       'playlist-read-private',
       'playlist-read-collaborative',
+      'playlist-modify-public',
+      'playlist-modify-private',
       'user-top-read',
       'user-read-email',
       'user-read-private',
       'user-read-playback-state',
       'user-modify-playback-state',
       'user-read-currently-playing',
-      'streaming'
+      'user-read-recently-played',
+      'streaming',
     ];
     const redirectUri = encodeURIComponent(environment.spotifyRedirectUri);
     const clientId = environment.spotifyClientId;
@@ -116,6 +119,23 @@ export class SpotifyService {
       console.error('Error fetching user profile:', error);
       throw error;
     }
+  }
+
+  async getRecentlyPlayedTracks(): Promise<any[]> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    const response: any = await firstValueFrom(
+      this.http.get('https://api.spotify.com/v1/me/player/recently-played?limit=20', { headers })
+    );
+    return response.items;
+  }
+
+  async getPlaylistById(id: string): Promise<any> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    return await firstValueFrom(
+      this.http.get(`https://api.spotify.com/v1/playlists/${id}`, { headers })
+    );
   }
 
   async getUserPlaylists(): Promise<any> {
@@ -309,6 +329,50 @@ export class SpotifyService {
       this.http.post('https://api.spotify.com/v1/me/player/previous', 
         {}, 
         { headers, responseType: 'text' })
+    );
+  }
+
+  async createPlaylist(name: string, description: string = ''): Promise<any> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    if (!accessToken) {
+      throw new Error('Access token not found. Please log in.');
+    }
+
+    // Get the current user's Spotify ID
+    const userProfile = await this.getUserProfile();
+    const userId = userProfile.id;
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    });
+
+    const body = {
+      name,
+      description,
+      public: true
+    };
+
+    try {
+      const response: any = await firstValueFrom(
+        this.http.post(`https://api.spotify.com/v1/users/${userId}/playlists`, body, { headers })
+      );
+      return response;
+    } catch (error) {
+      console.error('Error creating playlist:', error);
+      throw error;
+    }
+  }
+
+  async addTrackToPlaylist(playlistId: string, trackUri: string): Promise<any> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    });
+    const body = { uris: [trackUri] };
+    return firstValueFrom(
+      this.http.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, body, { headers })
     );
   }
 }

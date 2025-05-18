@@ -8,5 +8,27 @@
       <ion-icon name="navigate-outline"></ion-icon>
       <ion-label>Explore</ion-label>
     </ion-tab-button>
+    <ion-tab-button (click)="openCreatePlaylistModal()">
+      <ion-icon name="add-outline"></ion-icon>
+      <ion-label>Create a Playlist</ion-label>
+    </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>
+
+<div *ngIf="showCreatePlaylistModal" class="inline-modal-backdrop">
+  <div class="inline-modal">
+    <h2>Create Playlist</h2>
+    <ion-item>
+      <ion-label position="stacked">Playlist Name</ion-label>
+      <ion-input [(ngModel)]="playlistName"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Description</ion-label>
+      <ion-input [(ngModel)]="playlistDescription"></ion-input>
+    </ion-item>
+    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+      <ion-button color="medium" (click)="closeCreatePlaylistModal()">Cancel</ion-button>
+      <ion-button color="primary" (click)="createPlaylist()" [disabled]="!playlistName">Create</ion-button>
+    </div>
+  </div>
+</div>

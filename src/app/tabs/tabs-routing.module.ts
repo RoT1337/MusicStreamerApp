@@ -23,7 +23,7 @@ const routes: Routes = [
       {
         path: 'playlist/:id',
         loadChildren: () => import('./playlist-details/playlist-details.module').then( m => m.PlaylistDetailsPageModule)
-      },
+      }
     ],
   },
   {

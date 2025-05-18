@@ -21,7 +21,7 @@
   <div class="body ion-padding">
 
     <!-- Top buttons for moods -->
-    <div class="top-swipe-buttons">
+    <!-- <div class="top-swipe-buttons">
       <swiper-container 
         space-between="10" 
         slides-per-view="auto"
@@ -53,11 +53,12 @@
           <ion-button class="mood">Focus</ion-button>
         </swiper-slide>
       </swiper-container>
-    </div>
+    </div> -->
 
     <!-- Quick picks portion -->
     <div class="quick-picks-portion">
       <h3>Quick Picks</h3>
+      <ion-spinner *ngIf="isLoadingQuickPicks" name="crescent"></ion-spinner>
       <swiper-container 
         slides-per-view="1.2" 
         space-between="15"
@@ -67,13 +68,13 @@
           <ion-button class="quick-song-pick" fill="clear" (click)="playSong(track.uri)">
             <ion-item lines="none">
               <ion-thumbnail slot="start">
-                <img [src]="track.album.images[0]?.url" [alt]="track.name" />
+                <img [src]="track.album.images[0]?.url || 'assets/default-music.png'" [alt]="track.name" />
               </ion-thumbnail>
               <ion-label>
                 <h4>{{ track.name }}</h4>
                 <p>{{ track.artists[0]?.name }}</p>
               </ion-label>
-              <ion-button class="ellipsis-btn" fill="clear">
+              <ion-button class="ellipsis-btn" fill="clear" (click)="openAddToPlaylistModal(track.uri)">
                 <ion-icon name="ellipsis-vertical" slot="end"></ion-icon>
               </ion-button>
             </ion-item>
@@ -82,9 +83,35 @@
       </swiper-container>
     </div>
 
+    <!-- Recent Playlist -->
+    <div class="recent-playlist-portion">
+      <h3>Your Playlists</h3>
+      <ion-spinner *ngIf="isLoadingRecentPlaylist" name="crescent"></ion-spinner>
+      <swiper-container *ngIf="!isLoadingRecentPlaylist"
+        slides-per-view="2.2"
+        space-between="10"
+        free-mode="true"
+      >
+        <swiper-slide *ngFor="let playlist of recentPlaylists">
+          <ion-button class="saved-playlist">
+            <div class="playlist-content">
+              <ion-thumbnail class="saved-playlist-thumbnail">
+                <img [src]="playlist.images?.[0]?.url || 'assets/default-music.png'" [alt]="playlist.name" />
+              </ion-thumbnail>
+              <ion-label>
+                <h4>{{ playlist.name }}</h4>
+                <p>{{ playlist.owner.display_name }}</p>
+              </ion-label>
+            </div>
+          </ion-button>
+        </swiper-slide>
+      </swiper-container>
+    </div>
+
     <!-- Recommended Albums -->
     <div class="quick-pick-albums-portion">
       <h3>Recommended Albums</h3>
+      <ion-spinner *ngIf="isLoadingAlbums" name="crescent"></ion-spinner>
       <swiper-container
         slides-per-view="2.2"
         space-between="10"
@@ -94,7 +121,7 @@
           <ion-button class="saved-playlist" (click)="openAlbum(album.id)">
             <div class="playlist-content">
               <ion-thumbnail class="saved-playlist-thumbnail">
-                <img [src]="album.images?.[0]?.url" [alt]="album.name" />
+                <img [src]="album.images?.[0]?.url || 'assets/default-music.png'" [alt]="album.name" />
               </ion-thumbnail>
               <ion-label>
                 <h4>{{ album.name }}</h4>
@@ -113,6 +140,7 @@
     <!-- Personal playlists portion -->
     <div class="from-your-library-portion">
       <h3>From Your Library</h3>
+      <ion-spinner *ngIf="isLoadingPlaylists" name="crescent"></ion-spinner>
       <swiper-container
         slides-per-view="2.2"
         space-between="10"
@@ -122,7 +150,7 @@
           <ion-button class="saved-playlist">
             <div class="playlist-content">
               <ion-thumbnail class="saved-playlist-thumbnail">
-                <img [src]="playlist.images?.[0]?.url" [alt]="playlist.name" />
+                <img [src]="playlist.images?.[0]?.url || 'assets/default-music.png'" [alt]="playlist.name" />
               </ion-thumbnail>
               <ion-label>
                 <h4>{{ playlist.name }}</h4>
@@ -135,7 +163,7 @@
     </div>
 
     <!-- New releases for you portion -->
-    <div class="from-your-library-portion">
+    <!-- <div class="from-your-library-portion">
       <h3>New Releases For You</h3>
       <swiper-container
         slides-per-view="2.2"
@@ -208,6 +236,27 @@
           </ion-button>
         </swiper-slide>
       </swiper-container>
+    </div> -->
+  </div>
+
+  <!-- Add song inline modal -->
+  <div *ngIf="addToPlaylistModalOpen" class="inline-modal-backdrop">
+    <div class="inline-modal">
+      <h3>Add to Playlist</h3>
+      <ion-list>
+        <ion-item *ngFor="let playlist of recentPlaylists">
+          <ion-checkbox
+            slot="start"
+            [checked]="selectedPlaylistsToAdd.has(playlist.id)"
+            (ionChange)="togglePlaylistSelection(playlist.id)">
+          </ion-checkbox>
+          <ion-label>{{ playlist.name }}</ion-label>
+        </ion-item>
+      </ion-list>
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <ion-button color="medium" (click)="closeAddToPlaylistModal()">Cancel</ion-button>
+        <ion-button color="primary" (click)="addTrackToSelectedPlaylists()" [disabled]="selectedPlaylistsToAdd.size === 0">Add</ion-button>
+      </div>
     </div>
   </div>
 </ion-content>
