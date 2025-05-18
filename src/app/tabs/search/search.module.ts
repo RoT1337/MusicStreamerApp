@@ -9,6 +9,8 @@ import { SearchPageRoutingModule } from './search-routing.module';
 import { SearchPage } from './search.page';
 
 import { UserRecommendationsComponent } from 'src/app/components/user-recommendations/user-recommendations.component';
+import { NewReleasesComponent } from 'src/app/components/new-releases/new-releases.component';
+import { TopSongsComponent } from 'src/app/components/top-songs/top-songs.component';
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
@@ -19,7 +21,12 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     IonicModule,
     SearchPageRoutingModule
   ],
-  declarations: [SearchPage, UserRecommendationsComponent],
+  declarations: [
+    SearchPage, 
+    UserRecommendationsComponent,
+    NewReleasesComponent,
+    TopSongsComponent
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SearchPageModule {}

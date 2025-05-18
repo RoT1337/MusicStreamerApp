@@ -130,6 +130,15 @@ export class SpotifyService {
     return response.items;
   }
 
+  async getNewReleases(): Promise<any[]> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    const response: any = await firstValueFrom(
+      this.http.get('https://api.spotify.com/v1/browse/new-releases?limit=12', { headers })
+    );
+    return response.albums.items;
+  }
+
   async getPlaylistById(id: string): Promise<any> {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     const headers = { Authorization: `Bearer ${accessToken}` };

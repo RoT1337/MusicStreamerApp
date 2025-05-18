@@ -1,0 +1,55 @@
+<div class="section-header">
+  <h4>New Releases</h4>
+</div>
+<ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+<swiper-container *ngIf="!isLoading"
+  slides-per-view="2.2"
+  space-between="10"
+  free-mode="true"
+>
+  <swiper-slide *ngFor="let album of albums">
+    <ion-button class="saved-playlist" (click)="openAlbum(album.id)">
+      <div class="playlist-content">
+        <ion-thumbnail class="saved-playlist-thumbnail">
+          <img [src]="album.images?.[0]?.url || 'assets/default-music.png'" [alt]="album.name" />
+        </ion-thumbnail>
+        <ion-label>
+          <h4>{{ album.name }}</h4>
+          <p>
+            <span *ngFor="let artist of album.artists; let last = last">
+              {{ artist.name }}<span *ngIf="!last">, </span>
+            </span>
+          </p>
+        </ion-label>
+      </div>
+    </ion-button>
+  </swiper-slide>
+</swiper-container>
+
+<ion-modal
+  [isOpen]="addToPlaylistModalOpen"
+  (didDismiss)="closeAddToPlaylistModal()"
+  [breakpoints]="[0, 0.5, 0.9]"
+  [initialBreakpoint]="0.5"
+  cssClass="add-to-playlist-modal"
+>
+  <ng-template>
+    <div class="inline-modal ion-padding">
+      <h3>Add to Playlist</h3>
+      <ion-list>
+        <ion-item *ngFor="let playlist of userPlaylists">
+          <ion-checkbox
+            slot="start"
+            [checked]="selectedPlaylistsToAdd.has(playlist.id)"
+            (ionChange)="togglePlaylistSelection(playlist.id)">
+          </ion-checkbox>
+          <ion-label>{{ playlist.name }}</ion-label>
+        </ion-item>
+      </ion-list>
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <ion-button color="medium" (click)="closeAddToPlaylistModal()">Cancel</ion-button>
+        <ion-button color="primary" (click)="addTrackToSelectedPlaylists()" [disabled]="selectedPlaylistsToAdd.size === 0">Add</ion-button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>
