@@ -8,6 +8,10 @@ import { SearchPageRoutingModule } from './search-routing.module';
 
 import { SearchPage } from './search.page';
 
+import { UserRecommendationsComponent } from 'src/app/components/user-recommendations/user-recommendations.component';
+
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -15,6 +19,7 @@ import { SearchPage } from './search.page';
     IonicModule,
     SearchPageRoutingModule
   ],
-  declarations: [SearchPage]
+  declarations: [SearchPage, UserRecommendationsComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SearchPageModule {}

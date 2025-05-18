@@ -1,16 +1,10 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <div class="header">
     <ion-toolbar style="padding-top: 25px; --background: transparent;">
       <ion-title>
-        <ion-icon name="play-outline"></ion-icon> BeaM
+        Search
       </ion-title>
       <ion-buttons slot="end">
-        <ion-button>
-          <ion-icon name="notifications-outline"></ion-icon>
-        </ion-button>
-        <ion-button>
-          <ion-icon name="search-outline"></ion-icon>
-        </ion-button>
         <ion-button>
           <ion-icon name="person-outline"></ion-icon>
         </ion-button>
@@ -18,7 +12,86 @@
     </ion-toolbar>
   </div>
 
-  <div>
-    tetotetotetotetotetotetotetotetotetotetotetoteto
+  <div class="explore-content">
+    <ion-button expand="block" class="explore-content buttons" (click)="openSearchModal()">
+      <ion-icon name="search-outline"></ion-icon> What do you want to listen to?
+    </ion-button>
   </div>
+
+  <app-user-recommendations></app-user-recommendations>
+
+  <!-- Search Modal -->
+  <ion-modal
+    [isOpen]="showSearchModal"
+    (didDismiss)="closeSearchModal()"
+    cssClass="search-modal"
+  >
+    <ng-template>
+      <div class="search-modal-content ion-padding">
+        <div class="modal-header">
+          <ion-button fill="clear" (click)="closeSearchModal()" class="close-btn">
+            <ion-icon name="chevron-down-outline"></ion-icon>
+          </ion-button>
+          <h3>Search</h3>
+        </div>
+        <ion-item class="search-bar-item">
+          <ion-input
+            [(ngModel)]="searchQuery"
+            placeholder="Search for songs, artists, albums..."
+            (keyup.enter)="doSearch()"
+          ></ion-input>
+          <ion-button slot="end" color="primary" (click)="doSearch()" [disabled]="!searchQuery.trim()">
+            <ion-icon name="search-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <ion-spinner *ngIf="isSearching" name="crescent"></ion-spinner>
+        <ion-list *ngIf="searchResults.length > 0">
+          <ion-item *ngFor="let result of searchResults" (click)="playSong(result.uri)" class="search-result-item">
+            <ion-thumbnail slot="start">
+              <img [src]="result.album?.images?.[0]?.url || 'assets/default-music.png'" />
+            </ion-thumbnail>
+            <ion-label>
+              <h4>{{ result.name }}</h4>
+              <p *ngIf="result.artists">{{ result.artists[0]?.name }}</p>
+            </ion-label>
+            <ion-button fill="clear" slot="end" (click)="openAddToPlaylistModal(result.uri); $event.stopPropagation();">
+              <ion-icon name="ellipsis-vertical"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+        <div *ngIf="!isSearching && searchResults.length === 0 && searchQuery">
+          <p>No results found.</p>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Add to playlist modal -->
+  <ion-modal
+    [isOpen]="addToPlaylistModalOpen"
+    (didDismiss)="closeAddToPlaylistModal()"
+    [breakpoints]="[0, 0.5, 0.9]"
+    [initialBreakpoint]="0.5"
+    cssClass="add-to-playlist-modal"
+  >
+    <ng-template>
+      <div class="inline-modal ion-padding">
+        <h3>Add to Playlist</h3>
+        <ion-list>
+          <ion-item *ngFor="let playlist of userPlaylists">
+            <ion-checkbox
+              slot="start"
+              [checked]="selectedPlaylistsToAdd.has(playlist.id)"
+              (ionChange)="togglePlaylistSelection(playlist.id)">
+            </ion-checkbox>
+            <ion-label>{{ playlist.name }}</ion-label>
+          </ion-item>
+        </ion-list>
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+          <ion-button color="medium" (click)="closeAddToPlaylistModal()">Cancel</ion-button>
+          <ion-button color="primary" (click)="addTrackToSelectedPlaylists()" [disabled]="selectedPlaylistsToAdd.size === 0">Add</ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
 </ion-content>

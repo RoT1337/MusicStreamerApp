@@ -125,7 +125,7 @@ export class SpotifyService {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     const headers = { Authorization: `Bearer ${accessToken}` };
     const response: any = await firstValueFrom(
-      this.http.get('https://api.spotify.com/v1/me/player/recently-played?limit=20', { headers })
+      this.http.get('https://api.spotify.com/v1/me/player/recently-played?limit=6', { headers })
     );
     return response.items;
   }
@@ -374,5 +374,35 @@ export class SpotifyService {
     return firstValueFrom(
       this.http.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, body, { headers })
     );
+  }
+
+  async search(query: string): Promise<any[]> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    const params = new URLSearchParams({
+      q: query,
+      type: 'track',
+      limit: '15'
+    });
+    const response: any = await firstValueFrom(
+      this.http.get(`https://api.spotify.com/v1/search?${params.toString()}`, { headers })
+    );
+    return response.tracks.items;
+  }
+
+  async getRecommendations(): Promise<any[]> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    // For demo, use top artist as seed
+    const topArtists: any = await this.getUserTopArtists();
+    const seedArtist = topArtists[0]?.id;
+    const params = new URLSearchParams({
+      seed_artists: seedArtist,
+      limit: '10'
+    });
+    const response: any = await firstValueFrom(
+      this.http.get(`https://api.spotify.com/v1/recommendations?${params.toString()}`, { headers })
+    );
+    return response.tracks;
   }
 }
