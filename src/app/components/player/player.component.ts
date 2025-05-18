@@ -16,11 +16,14 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
   playerInstance: any = null;
 
   isPlaying = false;
+  loading = false;
   deviceId: string | null = null;
   currentLoadedTrackUri: string | null = null;
   currentPosition: number = 0;
   duration: number = 0;
   progressInterval: any;
+
+  showModal = false;
 
   constructor(private spotifyService: SpotifyService) { }
 
@@ -30,7 +33,12 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['trackUri'] && this.trackUri) {
+      this.currentPosition = 0;
+      this.duration = 0;
+      this.isPlaying = false;
+      this.loading = true;
       this.fetchTrackInfo();
+      this.play();
     }
   }
 
@@ -40,16 +48,33 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    //this.playerModal.dismiss();
+  }
+
+  onModalWillDismiss(event: CustomEvent) {
+    // Handle any cleanup or state reset if needed
+    this.showModal = false;
+  }
+
   startProgressUpdater() {
     this.progressInterval = setInterval(async () => {
       if (this.playerInstance && this.deviceId) {
         if (this.playerInstance.getCurrentState) {
           const state = await this.playerInstance.getCurrentState();
-          console.log('Player state:', state);
           if (state) {
             this.currentPosition = state.position;
             this.duration = state.duration;
             this.isPlaying = !state.paused;
+            this.loading = false;
+          } else {
+            this.isPlaying = false;
+            this.loading = true;
           }
         }
       }

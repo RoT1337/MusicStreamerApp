@@ -26,5 +26,4 @@ export class CallbackPage implements OnInit {
       console.error('Authorization code not found in URL');
     }
   }
-
 }

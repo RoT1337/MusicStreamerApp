@@ -6,9 +6,6 @@
       </ion-title>
       <ion-buttons slot="end">
         <ion-button>
-          <ion-icon name="notifications-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="login()">
           <div *ngIf="!userProfileImage">
             <ion-icon name="person-outline"></ion-icon>
             Log In
@@ -20,7 +17,7 @@
   </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" [class.has-player]="selectedTrackUri | async">
   <div class="body ion-padding">
 
     <!-- Top buttons for moods -->

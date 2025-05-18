@@ -22,6 +22,7 @@ export class HomePage implements OnInit{
 
   // Song variables
   quickPicks: any[] = [];
+  selectedTrackUri = this.playerService.trackUri$;
 
   // Album variables
   quickPickAlbums: any[] = [];
