@@ -96,6 +96,17 @@ export class PlaylistDetailsPage implements OnInit {
     this.closeAddToPlaylistModal();
   }
 
+  async shufflePlaylist() {
+    const uris = this.tracks
+      .map(item => item.track?.uri)
+      .filter(uri => !!uri);
+    if (!uris.length) return;
+    if (!this.playerService.shuffle) {
+      this.playerService.toggleShuffle();
+    }
+    await this.playerService.setQueue(uris);
+  }
+
   goBack() {
     this.location.back();
   }

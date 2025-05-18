@@ -115,6 +115,16 @@ export class AlbumDetailsPage implements OnInit {
     this.closeAddToPlaylistModal();
   }
 
+  async shuffleAlbum() {
+    if (!this.tracks?.length) return;
+    // Enable shuffle in the player service
+    if (!this.playerService.shuffle) {
+      this.playerService.toggleShuffle();
+    }
+    const uris = this.tracks.map(track => track.uri);
+    await this.playerService.setQueue(uris);
+  }
+
   openAlbumOptions() {
     this.showAlbumOptions = true;
   }
