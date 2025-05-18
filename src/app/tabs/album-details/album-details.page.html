@@ -19,66 +19,75 @@
 
   <div class="album-actions">
     <div class="left-actions">
-      <ion-button fill="clear" size="small">
+      <ion-button fill="clear" size="small" (click)="openAddAlbumToPlaylistModal()"> 
         <ion-icon name="add-outline"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" size="small">
-        <ion-icon name="download-outline"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" size="small" (click)="openAlbumOptions()">
-        <ion-icon name="ellipsis-horizontal"></ion-icon>
       </ion-button>
     </div>
     <div class="right-actions">
       <ion-button fill="clear" size="small">
         <ion-icon name="shuffle-outline"></ion-icon>
       </ion-button>
-      <ion-button class="play-btn" shape="round" color="primary" (click)="playAlbum()">
-        <ion-icon name="play"></ion-icon>
+      <ion-button class="play-btn" shape="round" color="light" (click)="playAlbum()">
+        <ion-icon name="play" slot="icon-only" color="dark"></ion-icon>
       </ion-button>
     </div>
   </div>
 
-  <ion-list>
-    <ion-item *ngFor="let track of tracks">
+  <div class="album-tracks-list">
+    <ion-button
+      *ngFor="let track of tracks"
+      class="album-track-btn"
+      expand="block"
+      (click)="playTrack(track.uri)"
+    >
       <ion-thumbnail slot="start" class="track-thumb">
         <img [src]="track.album?.images?.[0]?.url || album?.images?.[0]?.url" [alt]="track.name" />
+        <ion-icon name="play-circle" class="play-icon"></ion-icon>
       </ion-thumbnail>
       <ion-label>
-        <div class="track-title">{{ track.name }}</div>
-        <div class="track-artists">
+        <h4>{{ track.name }}</h4>
+        <p>
           <span *ngFor="let artist of track.artists; let last = last">
             {{ artist.name }}<span *ngIf="!last">, </span>
           </span>
-        </div>
+        </p>
       </ion-label>
-      <ion-button fill="clear" slot="end" (click)="openTrackOptions(track)">
+      <ion-button
+        fill="clear"
+        color="medium"
+        slot="end"
+        class="ellipsis-btn"
+        (click)="openAddToPlaylistModal(track.uri); $event.stopPropagation();"
+      >
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
-    </ion-item>
-  </ion-list>
+    </ion-button>
+  </div>
 
-  <!-- Album options modal -->
-  <ion-modal [isOpen]="showAlbumOptions" (didDismiss)="showAlbumOptions = false">
-    <ion-content>
-      <ion-list>
-        <ion-item button>Add to Playlist</ion-item>
-        <ion-item button>Download</ion-item>
-        <ion-item button>Share</ion-item>
-        <ion-item button (click)="showAlbumOptions = false">Close</ion-item>
-      </ion-list>
-    </ion-content>
-  </ion-modal>
-
-  <!-- Track options modal -->
-  <ion-modal [isOpen]="showTrackOptions" (didDismiss)="showTrackOptions = false">
-    <ion-content>
-      <ion-list>
-        <ion-item button>Add to Liked Songs</ion-item>
-        <ion-item button>Add to Playlist</ion-item>
-        <ion-item button>Share</ion-item>
-        <ion-item button (click)="showTrackOptions = false">Close</ion-item>
-      </ion-list>
-    </ion-content>
+  <ion-modal
+    [isOpen]="addToPlaylistModalOpen"
+    (didDismiss)="closeAddToPlaylistModal()"
+    [breakpoints]="[0, 0.5, 0.9]"
+    [initialBreakpoint]="0.5"
+  >
+    <ng-template>
+      <div class="inline-modal ion-padding">
+        <h3>Add to Playlist</h3>
+        <ion-list>
+          <ion-item *ngFor="let playlist of userPlaylists">
+            <ion-checkbox
+              slot="start"
+              [checked]="selectedPlaylistsToAdd.has(playlist.id)"
+              (ionChange)="togglePlaylistSelection(playlist.id)">
+            </ion-checkbox>
+            <ion-label>{{ playlist.name }}</ion-label>
+          </ion-item>
+        </ion-list>
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+          <ion-button color="medium" (click)="closeAddToPlaylistModal()">Cancel</ion-button>
+          <ion-button color="primary" (click)="addTrackToSelectedPlaylists()" [disabled]="selectedPlaylistsToAdd.size === 0">Add</ion-button>
+        </div>
+      </div>
+    </ng-template>
   </ion-modal>
 </ion-content>
