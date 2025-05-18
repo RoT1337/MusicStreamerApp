@@ -75,8 +75,8 @@
         <span class="duration">{{ duration | date:'mm:ss' }}</span>
       </div>
       <div class="player-controls-row">
-        <ion-button fill="clear">
-          <ion-icon name="shuffle-outline"></ion-icon>
+        <ion-button fill="clear" (click)="toggleShuffle()">
+          <ion-icon [name]="shuffle ? 'shuffle' : 'shuffle-outline'" [color]="shuffle ? 'primary' : ''"></ion-icon>
         </ion-button>
         <ion-button fill="clear" (click)="previous()">
           <ion-icon name="play-skip-back"></ion-icon>

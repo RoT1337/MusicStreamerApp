@@ -18,43 +18,8 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" [class.has-player]="selectedTrackUri | async">
+  
   <div class="body ion-padding">
-
-    <!-- Top buttons for moods -->
-    <!-- <div class="top-swipe-buttons">
-      <swiper-container 
-        space-between="10" 
-        slides-per-view="auto"
-        free-mode="true"
-        [breakpoints]="breakpoints"
-      >
-        <swiper-slide>
-          <ion-button class="mood">Energize</ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="mood">Relax</ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="mood">Feel good</ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="mood">Work out</ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="mood">Commute</ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="mood">Party</ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="mood">Romance</ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="mood">Focus</ion-button>
-        </swiper-slide>
-      </swiper-container>
-    </div> -->
-
     <!-- Quick picks portion -->
     <div class="quick-picks-portion">
       <h3>Quick Picks</h3>
@@ -93,7 +58,7 @@
         free-mode="true"
       >
         <swiper-slide *ngFor="let playlist of recentPlaylists">
-          <ion-button class="saved-playlist">
+          <ion-button class="saved-playlist" (click)="openPlaylist(playlist.id)">
             <div class="playlist-content">
               <ion-thumbnail class="saved-playlist-thumbnail">
                 <img [src]="playlist.images?.[0]?.url || 'assets/default-music.png'" [alt]="playlist.name" />
@@ -147,7 +112,7 @@
         free-mode="true"
       >
         <swiper-slide *ngFor="let playlist of userPlaylists">
-          <ion-button class="saved-playlist">
+          <ion-button class="saved-playlist" (click)="openPlaylist(playlist.id)">
             <div class="playlist-content">
               <ion-thumbnail class="saved-playlist-thumbnail">
                 <img [src]="playlist.images?.[0]?.url || 'assets/default-music.png'" [alt]="playlist.name" />
@@ -161,83 +126,6 @@
         </swiper-slide>
       </swiper-container>
     </div>
-
-    <!-- New releases for you portion -->
-    <!-- <div class="from-your-library-portion">
-      <h3>New Releases For You</h3>
-      <swiper-container
-        slides-per-view="2.2"
-        space-between="10"
-        free-mode="true"
-      >
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-plagiarism-album.png" alt="your playlist 1">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>J-Poppers</h4>
-                <p>Rovultion</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-haru.jpg" alt="your playlist 2">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Different</h4>
-                <p>Roi</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-magiclantern-album.jpeg" alt="your playlist 3">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Moody</h4>
-                <p>Blues</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-matasaburo.jpg" alt="your playlist 4">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>Sol</h4>
-                <p>Rovultion</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-button class="saved-playlist">
-            <div class="playlist-content">
-              <ion-thumbnail class="saved-playlist-thumbnail">
-                <img src="assets/quick-picks-pics/yorushika-plagiarism-album.png" alt="your playlist 1">
-              </ion-thumbnail>
-              <ion-label>
-                <h4>J-Poppers</h4>
-                <p>Rovultion</p>
-              </ion-label>
-            </div>
-          </ion-button>
-        </swiper-slide>
-      </swiper-container>
-    </div> -->
-  </div>
 
   <!-- Add song inline modal -->
   <div *ngIf="addToPlaylistModalOpen" class="inline-modal-backdrop">
@@ -259,4 +147,4 @@
       </div>
     </div>
   </div>
-</ion-content>
+<!-- idk why </ion-content> is apparently being closed already so theres none -->

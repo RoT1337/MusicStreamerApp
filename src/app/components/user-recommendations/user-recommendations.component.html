@@ -2,25 +2,24 @@
   <h4>Recently Played</h4>
 </div>
 <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
-<div class="recommendations-grid" *ngIf="!isLoading">
-  <div 
-    class="recommendation-card" 
-    *ngFor="let track of recommendations"
-    (press)="openAddToPlaylistModal(track.uri)"
-  >
-    <ion-thumbnail class="track-thumbnail" (click)="playSong(track.uri)">
-      <img [src]="track.album?.images?.[0]?.url || 'assets/default-music.png'" [alt]="track.name" />
-      <ion-icon name="play-circle" class="play-icon"></ion-icon>
-    </ion-thumbnail>
-    <div class="track-info">
-      <div class="track-title">{{ track.name }}</div>
-      <div class="track-artist">{{ track.artists[0]?.name }}</div>
-    </div>
-    <ion-button fill="clear" class="ellipsis-btn" (click)="openAddToPlaylistModal(track.uri)">
-        <ion-icon name="ellipsis-vertical"></ion-icon>
-    </ion-button>
-  </div>
-</div>
+<ion-grid class="recommendations-grid" *ngIf="!isLoading">
+  <ion-row>
+    <ion-col
+      size="4"
+      *ngFor="let track of recommendations"
+      class="recommendation-card"
+    >
+      <ion-thumbnail class="track-thumbnail" (click)="playSong(track.uri)">
+        <img [src]="track.album?.images?.[0]?.url || 'assets/default-music.png'" [alt]="track.name" />
+        <ion-icon name="play-circle" class="play-icon"></ion-icon>
+      </ion-thumbnail>
+      <div class="track-info">
+        <div class="track-title">{{ track.name }}</div>
+        <div class="track-artist">{{ track.artists[0]?.name }}</div>
+      </div>
+    </ion-col>
+  </ion-row>
+</ion-grid>
 
 <!-- Inline Add to Playlist Modal -->
 <ion-modal

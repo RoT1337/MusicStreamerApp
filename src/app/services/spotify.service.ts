@@ -271,6 +271,18 @@ export class SpotifyService {
     );
   }
 
+  async setShuffle(state: boolean, deviceId?: string): Promise<void> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    let url = `https://api.spotify.com/v1/me/player/shuffle?state=${state}`;
+    if (deviceId) {
+      url += `&device_id=${deviceId}`;
+    }
+    await firstValueFrom(
+      this.http.put(url, {}, { headers, responseType: 'text' })
+    );
+  }
+
   async seekToPosition(positionMs: number, deviceId: string): Promise<void> {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
@@ -373,13 +385,17 @@ export class SpotifyService {
     }
   }
 
-  async addTrackToPlaylist(playlistId: string, trackUri: string): Promise<any> {
+  async addTrackToPlaylist(playlistId: string, trackUris: string | string[]): Promise<any> {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     const headers = new HttpHeaders({
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json'
     });
-    const body = { uris: [trackUri] };
+
+    // Accept both a single URI or an array of URIs
+    const uris = Array.isArray(trackUris) ? trackUris : [trackUris];
+
+    const body = { uris };
     return firstValueFrom(
       this.http.post(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, body, { headers })
     );

@@ -190,4 +190,8 @@ export class HomePage implements OnInit{
     }
     this.closeAddToPlaylistModal();
   }
+
+  openPlaylist(playlistId: string) {
+    this.router.navigate(['tabs/playlist', playlistId]);
+  }
 }

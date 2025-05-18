@@ -27,6 +27,8 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
 
   showModal = false;
 
+  shuffle = false;
+
   // Queue
   showQueueModal = false;
   queue: string[] = [];
@@ -65,6 +67,8 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
     this.queueIndexSub = this.playerService.queueIndex$.subscribe(idx => {
       this.queueIndex = idx;
     });
+
+    this.shuffle = this.playerService.shuffle;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -225,5 +229,10 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
 
   async previous() {
     this.playerService.previousTrack();
+  }
+
+  toggleShuffle() {
+    this.playerService.toggleShuffle();
+    this.shuffle = this.playerService.shuffle;
   }
 }

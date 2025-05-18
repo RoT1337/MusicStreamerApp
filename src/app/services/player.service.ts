@@ -18,6 +18,10 @@ export class PlayerService {
   private queueIndexSubject = new BehaviorSubject<number>(0);
   queueIndex$ = this.queueIndexSubject.asObservable();
 
+  // Shuffle state and original queue
+  shuffle = false;
+  private originalQueue: string[] = [];
+
   constructor(private spotifyService: SpotifyService) {
     this.loadLastTrack();
   }
@@ -47,14 +51,44 @@ export class PlayerService {
   }
 
   async setQueue(uris: string[]) {
-    this.queueSubject.next(uris);
+    this.originalQueue = [...uris];
+    const queueToSet = this.shuffle ? this.shuffleArray([...uris]) : [...uris];
+    this.queueSubject.next(queueToSet);
     this.queueIndexSubject.next(0);
-    this.setTrackUri(uris[0]);
+    this.setTrackUri(queueToSet[0]);
   }
 
   addToQueue(uri: string) {
     const current = this.queueSubject.value;
     this.queueSubject.next([...current, uri]);
+  }
+
+  toggleShuffle() {
+    this.shuffle = !this.shuffle;
+    let currentTrack = this.trackUriSubject.value;
+    let queue = this.queueSubject.value;
+
+    if (this.shuffle) {
+      // Shuffle the queue, keep current track at the front
+      const rest = queue.filter(uri => uri !== currentTrack);
+      const shuffled = this.shuffleArray(rest);
+      const newQueue = currentTrack ? [currentTrack, ...shuffled] : shuffled;
+      this.queueSubject.next(newQueue);
+      this.queueIndexSubject.next(0);
+    } else {
+      // Restore original order, set index to current track
+      const idx = this.originalQueue.indexOf(currentTrack ?? '');
+      this.queueSubject.next([...this.originalQueue]);
+      this.queueIndexSubject.next(idx >= 0 ? idx : 0);
+    }
+  }
+
+  shuffleArray(array: string[]): string[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 
   async nextTrack() {
