@@ -140,6 +140,15 @@ export class SpotifyService {
     }
   }
 
+  async getUserTopTracks(): Promise<any[]> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    const response: any = await firstValueFrom(
+      this.http.get('https://api.spotify.com/v1/me/top/tracks?limit=10', { headers })
+    );
+    return response.items;
+  }
+
   // Get user's top artists for a given time range
   async getUserTopArtists(time_range: 'short_term' | 'long_term' = 'short_term'): Promise<any[]> {
     const accessToken = localStorage.getItem('spotifyAccessToken');

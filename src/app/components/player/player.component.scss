@@ -83,22 +83,60 @@ ion-label {
     display: flex;
     align-items: center;
     padding: 16px;
-    padding-top: 30px;
+    padding-top: 40px;
     .close-icon {
       font-size: 28px;
       cursor: pointer;
     }
   }
-  .album-art-section {
+
+  // Center pics
+  .album-art-peek-row {
     display: flex;
     justify-content: center;
-    margin: 24px 0;
-    .large-thumbnail {
-      --size: 300px;
-      border-radius: 16px;
-      overflow: hidden;
-    }
+    align-items: center;
+    position: relative;
+    margin: 32px 0 24px 0;
+    height: 260px; 
   }
+
+  .peek-thumb {
+    width: 140px;
+    height: 140px;
+    opacity: 0.7;
+    position: relative;
+    z-index: 1;
+    transition: opacity 0.2s;
+    filter: blur(1px) brightness(0.8);
+    pointer-events: none;
+  }
+
+  .peek-thumb.left {
+    margin-left: 25px;
+  }
+
+  // .peek-thumb.right {
+  //   margin-left: -50px;
+  // }
+
+  .center-thumb {
+    z-index: 2;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .large-thumbnail {
+    --size: 220px;
+    width: 220px;
+    height: 220px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.35);
+  }
+
   .track-info-section {
     text-align: center;
     .track-title {
@@ -139,9 +177,39 @@ ion-label {
   }
 }
 
-// .player-controls {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   gap: 16px;
-// }
+.queue-btn-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.queue-btn-row ion-button {
+  --color: #fff;
+  font-size: 18px;
+}
+
+.queue-modal {
+  --height: 70%;
+  --width: 100%;
+  --border-radius: 24px 24px 0 0;
+  align-items: flex-end;
+  justify-content: flex-end;
+  bottom: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.queue-content {
+  padding-bottom: 32px;
+  background: #232323;
+  border-radius: 24px 24px 0 0;
+}
+
+ion-item.current {
+  background: var(--ion-color-primary, #1e90ff);
+  color: #fff;
+}

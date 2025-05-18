@@ -40,10 +40,22 @@
       <div class="modal-header">
         <ion-icon name="chevron-down-outline" class="close-icon" (click)="closeModal()"></ion-icon>
       </div>
-      <div class="album-art-section">
-        <ion-thumbnail class="large-thumbnail">
-          <img [src]="trackImage" [alt]="trackName" />
-        </ion-thumbnail>
+      <div class="album-art-peek-row">
+        <div class="peek-thumb left">
+          <ion-thumbnail>
+            <img *ngIf="previousTrackUri" [src]="getTrackImage(previousTrackUri)" />
+          </ion-thumbnail>
+        </div>
+        <div class="center-thumb">
+          <ion-thumbnail class="large-thumbnail">
+            <img [src]="trackImage" [alt]="trackName" />
+          </ion-thumbnail>
+        </div>
+        <div class="peek-thumb right">
+          <ion-thumbnail>
+            <img *ngIf="nextTrackUri" [src]="getTrackImage(nextTrackUri)" />
+          </ion-thumbnail>
+        </div>
       </div>
       <div class="track-info-section">
         <div class="track-title">{{ trackName }}</div>
@@ -79,6 +91,46 @@
           <ion-icon name="repeat-outline"></ion-icon>
         </ion-button>
       </div>
+      <div class="queue-btn-row">
+        <ion-button fill="clear" (click)="openQueueModal()">
+          <ion-icon name="list-outline"></ion-icon>
+          Queue
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Queue Modal -->
+<ion-modal
+  [isOpen]="showQueueModal"
+  (willDismiss)="closeQueueModal()"
+  class="queue-modal"
+>
+  <ng-template>
+    <ion-content class="queue-content">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Queue</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeQueueModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-list>
+        <ion-item *ngFor="let uri of queue; let i = index" [class.current]="uri === trackUri">
+          <ion-thumbnail slot="start">
+            <img [src]="getTrackImage(uri)" />
+          </ion-thumbnail>
+          <ion-label>
+            <div class="track-title">{{ getTrackName(uri) }}</div>
+            <div class="track-artist">{{ getTrackArtist(uri) }}</div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <div style="height: 32px"></div> <!-- Padding at bottom -->
     </ion-content>
   </ng-template>
 </ion-modal>

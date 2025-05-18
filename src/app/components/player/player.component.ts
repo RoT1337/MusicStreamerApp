@@ -1,5 +1,7 @@
 import { Component, Input, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { SpotifyService } from 'src/app/services/spotify.service';
+import { PlayerService } from 'src/app/services/player.service';
 
 @Component({
   selector: 'app-player',
@@ -25,7 +27,18 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
 
   showModal = false;
 
-  constructor(private spotifyService: SpotifyService) { }
+  // Queue
+  showQueueModal = false;
+  queue: string[] = [];
+  queueSub?: Subscription;
+  trackDetails: { [uri: string]: any } = {};
+  queueIndex: number = 0;
+  queueIndexSub?: Subscription;
+
+  constructor(
+    private spotifyService: SpotifyService,
+    private playerService: PlayerService
+  ) { }
 
   ngOnInit() {
     // Wait for the SDK to be ready
@@ -36,8 +49,24 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
         this.initPlayer();
       };
     }
+
+    this.queueSub = this.playerService.queue$.subscribe(q => {
+      this.queue = q;
+      // Fetch track details for all URIs in the queue
+      q.forEach(uri => {
+        if (!this.trackDetails[uri]) {
+          this.spotifyService.getTrackInfo(uri).then(info => {
+            this.trackDetails[uri] = info;
+          });
+        }
+      });
+    });
+
+    this.queueIndexSub = this.playerService.queueIndex$.subscribe(idx => {
+      this.queueIndex = idx;
+    });
   }
-  
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['trackUri'] && this.trackUri) {
       this.currentPosition = 0;
@@ -53,6 +82,20 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
     if (this.progressInterval) {
       clearInterval(this.progressInterval);
     }
+    this.queueSub?.unsubscribe();
+    this.queueIndexSub?.unsubscribe();
+  }
+
+  get currentIndex(): number {
+    return this.queueIndex;
+  }
+
+  get previousTrackUri(): string | null {
+    return this.currentIndex > 0 ? this.queue[this.currentIndex - 1] : null;
+  }
+
+  get nextTrackUri(): string | null {
+    return this.currentIndex < this.queue.length - 1 ? this.queue[this.currentIndex + 1] : null;
   }
 
   openModal() {
@@ -62,6 +105,26 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
   closeModal() {
     this.showModal = false;
     //this.playerModal.dismiss();
+  }
+
+  getTrackImage(uri: string) {
+    return this.trackDetails[uri]?.album?.images?.[0]?.url || '';
+  }
+  
+  getTrackName(uri: string) {
+    return this.trackDetails[uri]?.name || '';
+  }
+
+  getTrackArtist(uri: string) {
+    return this.trackDetails[uri]?.artists?.[0]?.name || '';
+  } 
+
+  openQueueModal() {
+    this.showQueueModal = true;
+  }
+
+  closeQueueModal() {
+    this.showQueueModal = false;
   }
 
   onModalWillDismiss(event: CustomEvent) {
@@ -79,6 +142,10 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
             this.duration = state.duration;
             this.isPlaying = !state.paused;
             this.loading = false;
+            // If track ended, go to next
+            if (state.position >= state.duration && !state.paused) {
+              this.playerService.nextTrack();
+            }
           } else {
             this.isPlaying = false;
             this.loading = true;
@@ -153,10 +220,10 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async next() {
-    await this.spotifyService.nextTrack();
+    this.playerService.nextTrack();
   }
 
   async previous() {
-    await this.spotifyService.previousTrack();
+    this.playerService.previousTrack();
   }
 }

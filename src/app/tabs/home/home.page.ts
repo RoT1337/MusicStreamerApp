@@ -110,9 +110,11 @@ export class HomePage implements OnInit{
     this.router.navigate(['tabs/album', albumId]);
   }
 
-  playSong(uri: string) {
+  async playSong(uri: string) {
     console.log('Selected track URI:', uri);
-    this.playerService.setTrackUri(uri);
+    await this.playerService.setQueue([uri]);
+    await this.playerService.setTrackUri(uri);
+    await this.playerService.addTopTracksToQueue(uri);
   }
 
   login() {
