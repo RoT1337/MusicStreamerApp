@@ -28,9 +28,16 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
   constructor(private spotifyService: SpotifyService) { }
 
   ngOnInit() {
-    this.initPlayer();
+    // Wait for the SDK to be ready
+    if ((window as any).Spotify) {
+      this.initPlayer();
+    } else {
+      (window as any).onSpotifyWebPlaybackSDKReady = () => {
+        this.initPlayer();
+      };
+    }
   }
-
+  
   ngOnChanges(changes: SimpleChanges) {
     if (changes['trackUri'] && this.trackUri) {
       this.currentPosition = 0;
