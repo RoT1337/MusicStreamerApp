@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { PlayerService } from 'src/app/services/player.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
 import { Location } from '@angular/common';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-playlist-details',
@@ -20,18 +21,33 @@ export class PlaylistDetailsPage implements OnInit {
   selectedPlaylistsToAdd: Set<string> = new Set();
   userPlaylists: any[] = [];
 
+  isLoading = true;
+
   constructor(
     private route: ActivatedRoute,
     private spotifyService: SpotifyService,
     private playerService: PlayerService,
-    private location: Location
+    private location: Location,
+    private toastController: ToastController
   ) {}
 
   async ngOnInit() {
+    this.isLoading = true;
     this.playlistId = this.route.snapshot.paramMap.get('id') || '';
     this.playlist = await this.spotifyService.getPlaylistInfo(this.playlistId);
     this.tracks = this.playlist.tracks.items;
     this.userPlaylists = await this.spotifyService.getUserPlaylists();
+    this.isLoading = false;
+  }
+
+  async presentToast(message: string, color: 'success' | 'danger' = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
   async playPlaylist() {
@@ -76,24 +92,26 @@ export class PlaylistDetailsPage implements OnInit {
   }
 
   async addTrackToSelectedPlaylists() {
-    if (this.addToPlaylistTrackUri) {
-      // Single track
-      for (const playlistId of this.selectedPlaylistsToAdd) {
-        await this.spotifyService.addTrackToPlaylist(playlistId, this.addToPlaylistTrackUri);
-      }
-    } else {
-      // Entire playlist
-      const uris = this.tracks
-        .map(item => item.track?.uri)
-        .filter(uri => !!uri);
-      for (const playlistId of this.selectedPlaylistsToAdd) {
-        // Add in batches of 100 if needed
-        for (let i = 0; i < uris.length; i += 100) {
-          await this.spotifyService.addTrackToPlaylist(playlistId, uris.slice(i, i + 100));
+    try {
+      if (this.addToPlaylistTrackUri) {
+        for (const playlistId of this.selectedPlaylistsToAdd) {
+          await this.spotifyService.addTrackToPlaylist(playlistId, this.addToPlaylistTrackUri);
+        }
+      } else {
+        const uris = this.tracks
+          .map(item => item.track?.uri ?? item.uri)
+          .filter(uri => !!uri);
+        for (const playlistId of this.selectedPlaylistsToAdd) {
+          for (let i = 0; i < uris.length; i += 100) {
+            await this.spotifyService.addTrackToPlaylist(playlistId, uris.slice(i, i + 100));
+          }
         }
       }
+      this.closeAddToPlaylistModal();
+      this.presentToast('Added to playlist!');
+    } catch (error) {
+      this.presentToast('Failed to add to playlist.', 'danger');
     }
-    this.closeAddToPlaylistModal();
   }
 
   async shufflePlaylist() {

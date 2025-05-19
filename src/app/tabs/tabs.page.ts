@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SpotifyService } from '../services/spotify.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tabs',
@@ -15,9 +16,22 @@ export class TabsPage implements OnInit {
   playlistName = '';
   playlistDescription = '';
 
-  constructor(private spotifyService: SpotifyService) { }
+  constructor(
+    private spotifyService: SpotifyService,
+    private toastController: ToastController
+  ) { }
 
   ngOnInit() {
+  }
+
+  async presentToast(message: string, color: 'success' | 'danger' = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
   openCreatePlaylistModal() {
@@ -31,7 +45,12 @@ export class TabsPage implements OnInit {
   }
 
   async createPlaylist() {
-    await this.spotifyService.createPlaylist(this.playlistName, this.playlistDescription);
-    this.closeCreatePlaylistModal();
+    try {
+      await this.spotifyService.createPlaylist(this.playlistName, this.playlistDescription);
+      this.closeCreatePlaylistModal();
+      this.presentToast('Playlist created successfully!');
+    } catch (error) {
+      this.presentToast('Failed to create playlist.', 'danger');
+    }
   }
 }

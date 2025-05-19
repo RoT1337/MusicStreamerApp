@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerService } from 'src/app/services/player.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -46,7 +47,8 @@ export class HomePage implements OnInit{
   constructor(
     private spotifyService: SpotifyService,
     private router: Router,
-    private playerService: PlayerService
+    private playerService: PlayerService,
+    private toastController: ToastController
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +63,16 @@ export class HomePage implements OnInit{
     this.loadQuickPicks();
     this.loadQuickPickAlbums();
     this.loadRecentPlaylists();
+  }
+
+  async presentToast(message: string, color: 'success' | 'danger' = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
   async loadUserProfile() {
@@ -184,11 +196,16 @@ export class HomePage implements OnInit{
   }
 
   async addTrackToSelectedPlaylists() {
-    if (!this.addToPlaylistTrackUri) return;
-    for (const playlistId of this.selectedPlaylistsToAdd) {
-      await this.spotifyService.addTrackToPlaylist(playlistId, this.addToPlaylistTrackUri);
+    try {
+      if (!this.addToPlaylistTrackUri) return;
+      for (const playlistId of this.selectedPlaylistsToAdd) {
+        await this.spotifyService.addTrackToPlaylist(playlistId, this.addToPlaylistTrackUri);
+      }
+      this.closeAddToPlaylistModal();
+      this.presentToast('Track added to playlist!');
+    } catch (error) {
+      this.presentToast('Failed to add track to playlist.', 'danger');
     }
-    this.closeAddToPlaylistModal();
   }
 
   openPlaylist(playlistId: string) {

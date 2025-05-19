@@ -127,24 +127,33 @@
       </swiper-container>
     </div>
 
-  <!-- Add song inline modal -->
-  <div *ngIf="addToPlaylistModalOpen" class="inline-modal-backdrop">
-    <div class="inline-modal">
-      <h3>Add to Playlist</h3>
-      <ion-list>
-        <ion-item *ngFor="let playlist of recentPlaylists">
-          <ion-checkbox
-            slot="start"
-            [checked]="selectedPlaylistsToAdd.has(playlist.id)"
-            (ionChange)="togglePlaylistSelection(playlist.id)">
-          </ion-checkbox>
-          <ion-label>{{ playlist.name }}</ion-label>
-        </ion-item>
-      </ion-list>
-      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-        <ion-button color="medium" (click)="closeAddToPlaylistModal()">Cancel</ion-button>
-        <ion-button color="primary" (click)="addTrackToSelectedPlaylists()" [disabled]="selectedPlaylistsToAdd.size === 0">Add</ion-button>
+  <!-- Add song ion-modal -->
+  <ion-modal
+    [isOpen]="addToPlaylistModalOpen"
+    (didDismiss)="closeAddToPlaylistModal()"
+    [breakpoints]="[0, 0.5, 0.9]"
+    [initialBreakpoint]="0.5"
+  >
+    <ng-template>
+      <div class="inline-modal ion-padding">
+        <h3>Add to Playlist</h3>
+        <div class="playlist-list-scroll">
+          <ion-list>
+            <ion-item *ngFor="let playlist of recentPlaylists">
+              <ion-checkbox
+                slot="start"
+                [checked]="selectedPlaylistsToAdd.has(playlist.id)"
+                (ionChange)="togglePlaylistSelection(playlist.id)">
+              </ion-checkbox>
+              <ion-label>{{ playlist.name }}</ion-label>
+            </ion-item>
+          </ion-list>
+        </div>
+        <div class="modal-actions">
+          <ion-button color="medium" (click)="closeAddToPlaylistModal()">Cancel</ion-button>
+          <ion-button color="primary" (click)="addTrackToSelectedPlaylists()" [disabled]="selectedPlaylistsToAdd.size === 0">Add</ion-button>
+        </div>
       </div>
-    </div>
-  </div>
+    </ng-template>
+  </ion-modal>
 <!-- idk why </ion-content> is apparently being closed already so theres none -->

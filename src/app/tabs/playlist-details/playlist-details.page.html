@@ -4,66 +4,69 @@
   </div>
 
   <div class="playlist-header">
-    <ion-thumbnail class="playlist-art">
-      <img [src]="playlist?.images?.[0]?.url" [alt]="playlist?.name" />
-    </ion-thumbnail>
-    <div class="playlist-info">
-      <h2>{{ playlist?.name }}</h2>
-      <div class="playlist-owner">
-        {{ playlist?.owner?.display_name }}
-      </div>
-      <div class="playlist-description" *ngIf="playlist?.description">
-        {{ playlist?.description }}
-      </div>
-    </div>
-  </div>
-
-  <div class="playlist-actions">
-    <div class="left-actions">
-      <ion-button fill="clear" size="small" (click)="openAddPlaylistToPlaylistModal()"> 
-        <ion-icon name="add-outline"></ion-icon>
-      </ion-button>
-    </div>
-    <div class="right-actions">
-      <ion-button fill="clear" size="small" (click)="shufflePlaylist()">
-        <ion-icon name="shuffle-outline"></ion-icon>
-      </ion-button>
-      <ion-button class="play-btn" shape="round" color="light" (click)="playPlaylist()">
-        <ion-icon name="play" slot="icon-only" color="dark"></ion-icon>
-      </ion-button>
-    </div>
-  </div>
-
-  <div class="playlist-tracks-list">
-    <ion-button
-      *ngFor="let track of tracks"
-      class="playlist-track-btn"
-      expand="block"
-      (click)="playTrack(track.track.uri)"
-      [disabled]="!track.track.uri"
-    >
-      <ion-thumbnail slot="start" class="track-thumb">
-        <img [src]="track.track.album?.images?.[0]?.url || playlist?.images?.[0]?.url" [alt]="track.track.name" />
-        <ion-icon name="play-circle" class="play-icon"></ion-icon>
+    <ion-spinner *ngIf="isLoading" name="crescent" style="display: block; margin: 48px auto;"></ion-spinner>
+    <div *ngIf="!isLoading">
+      <ion-thumbnail class="playlist-art">
+        <img [src]="playlist?.images?.[0]?.url" [alt]="playlist?.name" />
       </ion-thumbnail>
-      <ion-label>
-        <h4>{{ track.track.name }}</h4>
-        <p>
-          <span *ngFor="let artist of track.track.artists; let last = last">
-            {{ artist.name }}<span *ngIf="!last">, </span>
-          </span>
-        </p>
-      </ion-label>
+      <div class="playlist-info">
+        <h2>{{ playlist?.name }}</h2>
+        <div class="playlist-owner">
+          {{ playlist?.owner?.display_name }}
+        </div>
+        <div class="playlist-description" *ngIf="playlist?.description">
+          {{ playlist?.description }}
+        </div>
+      </div>
+    </div>
+
+    <div class="playlist-actions">
+      <div class="left-actions">
+        <ion-button fill="clear" size="small" (click)="openAddPlaylistToPlaylistModal()"> 
+          <ion-icon name="add-outline"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="right-actions">
+        <ion-button fill="clear" size="small" (click)="shufflePlaylist()">
+          <ion-icon name="shuffle-outline"></ion-icon>
+        </ion-button>
+        <ion-button class="play-btn" shape="round" color="light" (click)="playPlaylist()">
+          <ion-icon name="play" slot="icon-only" color="dark"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <div class="playlist-tracks-list">
       <ion-button
-        fill="clear"
-        color="medium"
-        slot="end"
-        class="ellipsis-btn"
-        (click)="openAddToPlaylistModal(track.track.uri); $event.stopPropagation();"
+        *ngFor="let track of tracks"
+        class="playlist-track-btn"
+        expand="block"
+        (click)="playTrack(track.track.uri)"
+        [disabled]="!track.track.uri"
       >
-        <ion-icon name="ellipsis-vertical"></ion-icon>
+        <ion-thumbnail slot="start" class="track-thumb">
+          <img [src]="track.track.album?.images?.[0]?.url || playlist?.images?.[0]?.url" [alt]="track.track.name" />
+          <ion-icon name="play-circle" class="play-icon"></ion-icon>
+        </ion-thumbnail>
+        <ion-label>
+          <h4>{{ track.track.name }}</h4>
+          <p>
+            <span *ngFor="let artist of track.track.artists; let last = last">
+              {{ artist.name }}<span *ngIf="!last">, </span>
+            </span>
+          </p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          color="medium"
+          slot="end"
+          class="ellipsis-btn"
+          (click)="openAddToPlaylistModal(track.track.uri); $event.stopPropagation();"
+        >
+          <ion-icon name="ellipsis-vertical"></ion-icon>
+        </ion-button>
       </ion-button>
-    </ion-button>
+    </div>
   </div>
 
   <!-- Add to Playlist Modal -->
@@ -76,17 +79,19 @@
     <ng-template>
       <div class="inline-modal ion-padding">
         <h3>Add to Playlist</h3>
-        <ion-list>
-          <ion-item *ngFor="let playlist of userPlaylists">
-            <ion-checkbox
-              slot="start"
-              [checked]="selectedPlaylistsToAdd.has(playlist.id)"
-              (ionChange)="togglePlaylistSelection(playlist.id)">
-            </ion-checkbox>
-            <ion-label>{{ playlist.name }}</ion-label>
-          </ion-item>
-        </ion-list>
-        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <div class="playlist-list-scroll">
+          <ion-list>
+            <ion-item *ngFor="let playlist of userPlaylists">
+              <ion-checkbox
+                slot="start"
+                [checked]="selectedPlaylistsToAdd.has(playlist.id)"
+                (ionChange)="togglePlaylistSelection(playlist.id)">
+              </ion-checkbox>
+              <ion-label>{{ playlist.name }}</ion-label>
+            </ion-item>
+          </ion-list>
+        </div>
+        <div class="modal-actions">
           <ion-button color="medium" (click)="closeAddToPlaylistModal()">Cancel</ion-button>
           <ion-button color="primary" (click)="addTrackToSelectedPlaylists()" [disabled]="selectedPlaylistsToAdd.size === 0">Add</ion-button>
         </div>
