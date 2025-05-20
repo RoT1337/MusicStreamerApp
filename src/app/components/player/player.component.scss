@@ -19,6 +19,16 @@
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.player-loading-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(24,24,24,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
 .player-bar {
   --background: transparent;
   align-items: center;

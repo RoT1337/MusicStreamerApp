@@ -142,10 +142,18 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
         if (this.playerInstance.getCurrentState) {
           const state = await this.playerInstance.getCurrentState();
           if (state) {
-            this.currentPosition = state.position;
-            this.duration = state.duration;
-            this.isPlaying = !state.paused;
-            this.loading = false;
+            const sdkTrackUri = state.track_window?.current_track?.uri;
+            if (sdkTrackUri === this.trackUri) {
+              this.currentPosition = state.position;
+              this.duration = state.duration;
+              this.isPlaying = !state.paused;
+              this.loading = false;
+            } else {
+              // SDK is not yet on the correct track, show loading
+              this.currentPosition = 0;
+              this.duration = 0;
+              this.loading = true;
+            }
             // If track ended, go to next
             if (state.position >= state.duration && !state.paused) {
               this.playerService.nextTrack();
@@ -203,12 +211,24 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
   async play() {
     if (this.trackUri && this.deviceId) {
       await this.spotifyService.transferPlayback(this.deviceId);
-      if (this.currentLoadedTrackUri === this.trackUri) {
+
+      // Always fetch the current state from the SDK
+      let state = null;
+      if (this.playerInstance && this.playerInstance.getCurrentState) {
+        state = await this.playerInstance.getCurrentState();
+      }
+
+      // Check if the SDK is already on the correct track and paused
+      const sdkTrackUri = state?.track_window?.current_track?.uri;
+      const isPaused = state?.paused;
+
+      if (sdkTrackUri === this.trackUri && isPaused) {
         await this.resume();
       } else {
         await this.spotifyService.playTrack(this.trackUri, this.deviceId);
         this.currentLoadedTrackUri = this.trackUri;
         this.isPlaying = true;
+        this.currentPosition = 0; // Reset progress
       }
     }
   }
@@ -224,11 +244,19 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async next() {
-    this.playerService.nextTrack();
+    await this.playerService.nextTrack();
+    this.currentPosition = 0;
+    this.duration = 0;
+    this.loading = true;
+    await this.play();
   }
 
   async previous() {
-    this.playerService.previousTrack();
+    await this.playerService.previousTrack();
+    this.currentPosition = 0;
+    this.duration = 0;
+    this.loading = true;
+    await this.play();
   }
 
   toggleShuffle() {

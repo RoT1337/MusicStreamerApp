@@ -15,13 +15,13 @@
       <div class="track-artist">{{ trackArtist }}</div>
     </ion-label>
     <ion-buttons slot="end" class="player-controls">
-      <ion-button fill="clear" (click)="previous(); $event.stopPropagation()">
+      <ion-button fill="clear" (click)="previous(); $event.stopPropagation()" [disabled]="loading">
         <ion-icon name="play-skip-back"></ion-icon>
       </ion-button>
-      <ion-button fill="clear" (click)="isPlaying ? pause() : play(); $event.stopPropagation()">
+      <ion-button fill="clear" (click)="isPlaying ? pause() : play(); $event.stopPropagation()" [disabled]="loading">
         <ion-icon [name]="isPlaying ? 'pause' : 'play'"></ion-icon>
       </ion-button>
-      <ion-button fill="clear" (click)="next(); $event.stopPropagation()">
+      <ion-button fill="clear" (click)="next(); $event.stopPropagation()" [disabled]="loading">
         <ion-icon name="play-skip-forward"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -75,20 +75,17 @@
         <span class="duration">{{ duration | date:'mm:ss' }}</span>
       </div>
       <div class="player-controls-row">
-        <ion-button fill="clear" (click)="toggleShuffle()">
+        <ion-button fill="clear" (click)="toggleShuffle()" [disabled]="loading">
           <ion-icon [name]="shuffle ? 'shuffle' : 'shuffle-outline'" [color]="shuffle ? 'primary' : ''"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" (click)="previous()">
+        <ion-button fill="clear" (click)="previous()" [disabled]="loading">
           <ion-icon name="play-skip-back"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" (click)="isPlaying ? pause() : play()" class="play-pause-btn">
+        <ion-button fill="clear" (click)="isPlaying ? pause() : play()" class="play-pause-btn" [disabled]="loading">
           <ion-icon [name]="isPlaying ? 'pause' : 'play'"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" (click)="next()">
+        <ion-button fill="clear" (click)="next()" [disabled]="loading">
           <ion-icon name="play-skip-forward"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear">
-          <ion-icon name="repeat-outline"></ion-icon>
         </ion-button>
       </div>
       <div class="queue-btn-row">
