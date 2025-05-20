@@ -69,7 +69,6 @@
           [value]="currentPosition"
           (ionChange)="onSeek($event)"
           [disabled]="!duration"
-          pin="true"
           color="primary"
         ></ion-range>
         <span class="duration">{{ duration | date:'mm:ss' }}</span>

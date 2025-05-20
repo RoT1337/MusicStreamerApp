@@ -12,6 +12,9 @@
           </div>
           <img *ngIf="userProfileImage" [src]="userProfileImage" alt="User Profile" style="width: 32px; height: 32px; border-radius: 50%;" />
         </ion-button>
+        <ion-button [routerLink]="['/tabs/settings']">
+          <ion-icon name="settings-outline"></ion-icon>
+        </ion-button>
       </ion-buttons>
     </ion-toolbar>
   </div>

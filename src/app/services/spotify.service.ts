@@ -265,7 +265,7 @@ export class SpotifyService {
     await firstValueFrom(
       this.http.put(
         'https://api.spotify.com/v1/me/player',
-        { device_ids: [deviceId], play: true },
+        { device_ids: [deviceId], play: false },
         { headers, responseType: 'text' }
       )
     );

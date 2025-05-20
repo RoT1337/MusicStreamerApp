@@ -1,0 +1,68 @@
+<ion-header class="primary-bg" style="--background: none;">
+  <ion-toolbar color="transparent" style="padding-top: 25px;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="primary-bg ion-padding">
+  <div class="settings-header" style="padding: 32px 0 16px 0; text-align: center; font-size: 2rem; font-weight: bold;">
+    <ion-icon name="settings-outline" style="font-size: 2.2rem; vertical-align: middle; margin-right: 8px;"></ion-icon>
+    Settings
+  </div>
+
+  <ion-list lines="full" class="settings-list">
+    <!-- Theme Selection -->
+    <ion-item>
+      <ion-label>Theme</ion-label>
+      <ion-select [(ngModel)]="theme" (ionChange)="onThemeChange($event)">
+        <ion-select-option value="auto">Auto</ion-select-option>
+        <ion-select-option value="light">Light</ion-select-option>
+        <ion-select-option value="dark">Dark</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- Autoplay Toggle -->
+    <ion-item>
+      <ion-label>Autoplay on App Start</ion-label>
+      <ion-toggle [(ngModel)]="autoplay" (ionChange)="onAutoplayChange()"></ion-toggle>
+    </ion-item>
+
+    <!-- Notification Preferences -->
+    <ion-item-divider color="light">
+      <ion-label>Notifications</ion-label>
+    </ion-item-divider>
+
+    <!-- Daily Music Reminder -->
+    <ion-item>
+      <ion-label>Daily Music Reminder</ion-label>
+      <ion-toggle [(ngModel)]="reminderEnabled" (ionChange)="toggleReminder()"></ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="reminderEnabled">
+      <ion-label>Reminder Time</ion-label>
+      <ion-datetime display-format="HH:mm" [(ngModel)]="reminderTime" (ionChange)="updateReminderTime()"></ion-datetime>
+    </ion-item>
+
+    <!-- New Release Notifications -->
+    <ion-item>
+      <ion-label>Notify on New Releases</ion-label>
+      <ion-toggle [(ngModel)]="newReleaseEnabled" (ionChange)="toggleNewReleaseNotif()"></ion-toggle>
+    </ion-item>
+
+    <!-- Daily Listening Summary -->
+    <ion-item>
+      <ion-label>Daily Listening Summary</ion-label>
+      <ion-toggle [(ngModel)]="summaryEnabled" (ionChange)="toggleSummaryNotif()"></ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="summaryEnabled">
+      <ion-label>Summary Time</ion-label>
+      <ion-datetime
+        display-format="HH:mm"
+        [(ngModel)]="summaryTime"
+        (ionChange)="updateSummaryTime()"
+      ></ion-datetime>
+    </ion-item>
+  </ion-list>
+</ion-content>

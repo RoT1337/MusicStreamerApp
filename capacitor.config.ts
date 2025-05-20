@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
       urlSchemes: ['beam']
     },
     SplashScreen: {
-      launchShowDirection: 2000,
+      launchShowDuration: 2000,
       backgroundColor: "#0f2027",
       showSpinner: true,
       androidSpinnerStyle: "small",

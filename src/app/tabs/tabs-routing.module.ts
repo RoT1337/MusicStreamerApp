@@ -23,7 +23,11 @@ const routes: Routes = [
       {
         path: 'playlist/:id',
         loadChildren: () => import('./playlist-details/playlist-details.module').then( m => m.PlaylistDetailsPageModule)
-      }
+      },
+      {
+        path: 'settings',
+        loadChildren: () => import('./settings/settings.module').then( m => m.SettingsPageModule)
+      },
     ],
   },
   {
