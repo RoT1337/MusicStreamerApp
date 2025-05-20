@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { SpotifyService } from 'src/app/services/spotify.service';
-import { PlayerService } from 'src/app/services/player.service';
 
 @Component({
   selector: 'app-search',
@@ -8,22 +7,18 @@ import { PlayerService } from 'src/app/services/player.service';
   styleUrls: ['./search.page.scss'],
   standalone: false,
 })
-export class SearchPage implements OnInit{
+export class SearchPage implements OnInit {
   showSearchModal = false;
   searchQuery = '';
   searchResults: any[] = [];
   isSearching = false;
 
-  // Add to playlist
   addToPlaylistModalOpen = false;
   addToPlaylistTrackUri: string | null = null;
   selectedPlaylistsToAdd: Set<string> = new Set();
   userPlaylists: any[] = [];
 
-  constructor(
-    private spotifyService: SpotifyService,
-    private playerService: PlayerService
-  ) {}
+  constructor(private spotifyService: SpotifyService) {}
 
   async ngOnInit() {
     this.userPlaylists = await this.spotifyService.getUserPlaylists();
@@ -80,8 +75,11 @@ export class SearchPage implements OnInit{
   }
 
   async playSong(uri: string) {
-    await this.playerService.setQueue([uri]);
-    await this.playerService.setTrackUri(uri);
-    await this.playerService.addTopTracksToQueue(uri);
+    const deviceId = localStorage.getItem('spotifyDeviceId');
+    if (!deviceId) {
+      // Optionally show a toast here
+      return;
+    }
+    await this.spotifyService.playUris([uri], deviceId);
   }
 }

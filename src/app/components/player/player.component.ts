@@ -1,7 +1,6 @@
-import { Component, Input, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SpotifyService } from 'src/app/services/spotify.service';
-import { PlayerService } from 'src/app/services/player.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-player',
@@ -9,41 +8,43 @@ import { PlayerService } from 'src/app/services/player.service';
   styleUrls: ['./player.component.scss'],
   standalone: false
 })
-export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() trackUri: string | null = null;
-  @Input() trackName: string = '';
-  @Input() trackArtist: string = '';
-  @Input() trackImage: string = '';
-
+export class PlayerComponent implements OnInit, OnDestroy {
+  
+  // Player check
+  state: any = null;
   playerInstance: any = null;
-
   isPlaying = false;
   loading = false;
   deviceId: string | null = null;
-  currentLoadedTrackUri: string | null = null;
+
+  // Progress bar
   currentPosition: number = 0;
   duration: number = 0;
-  progressInterval: any;
 
-  showModal = false;
+  // Track meta-data
+  trackName: string = '';
+  trackArtist: string = '';
+  trackImage: string = '';
 
+  // Player features
+  repeatMode: 'off' | 'context' | 'track' = 'off';
   shuffle = false;
+  progressInterval: any;
+  previousTrack: any = null;
+  nextTrack: any = null;
 
-  // Queue
+  // Modals
+  showModal = false;
   showQueueModal = false;
-  queue: string[] = [];
-  queueSub?: Subscription;
-  trackDetails: { [uri: string]: any } = {};
-  queueIndex: number = 0;
-  queueIndexSub?: Subscription;
+
+  queue: any[] = [];
 
   constructor(
     private spotifyService: SpotifyService,
-    private playerService: PlayerService
-  ) { }
+    private toastController: ToastController
+  ) {}
 
   ngOnInit() {
-    // Wait for the SDK to be ready
     if ((window as any).Spotify) {
       this.initPlayer();
     } else {
@@ -51,139 +52,30 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
         this.initPlayer();
       };
     }
-
-    this.queueSub = this.playerService.queue$.subscribe(q => {
-      this.queue = q;
-      // Fetch track details for all URIs in the queue
-      q.forEach(uri => {
-        if (!this.trackDetails[uri]) {
-          this.spotifyService.getTrackInfo(uri).then(info => {
-            this.trackDetails[uri] = info;
-          });
-        }
-      });
-    });
-
-    this.queueIndexSub = this.playerService.queueIndex$.subscribe(idx => {
-      this.queueIndex = idx;
-    });
-
-    this.shuffle = this.playerService.shuffle;
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['trackUri'] && this.trackUri) {
-      this.currentPosition = 0;
-      this.duration = 0;
-      this.isPlaying = false;
-      this.loading = true;
-      this.fetchTrackInfo();
-      this.play();
-    }
   }
 
   ngOnDestroy() {
     if (this.progressInterval) {
       clearInterval(this.progressInterval);
     }
-    this.queueSub?.unsubscribe();
-    this.queueIndexSub?.unsubscribe();
-  }
-
-  get currentIndex(): number {
-    return this.queueIndex;
-  }
-
-  get previousTrackUri(): string | null {
-    return this.currentIndex > 0 ? this.queue[this.currentIndex - 1] : null;
-  }
-
-  get nextTrackUri(): string | null {
-    return this.currentIndex < this.queue.length - 1 ? this.queue[this.currentIndex + 1] : null;
-  }
-
-  openModal() {
-    this.showModal = true;
-  }
-
-  closeModal() {
-    this.showModal = false;
-    //this.playerModal.dismiss();
-  }
-
-  getTrackImage(uri: string) {
-    return this.trackDetails[uri]?.album?.images?.[0]?.url || '';
-  }
-  
-  getTrackName(uri: string) {
-    return this.trackDetails[uri]?.name || '';
-  }
-
-  getTrackArtist(uri: string) {
-    return this.trackDetails[uri]?.artists?.[0]?.name || '';
-  } 
-
-  openQueueModal() {
-    this.showQueueModal = true;
-  }
-
-  closeQueueModal() {
-    this.showQueueModal = false;
-  }
-
-  onModalWillDismiss(event: CustomEvent) {
-    // Handle any cleanup or state reset if needed
-    this.showModal = false;
-  }
-
-  startProgressUpdater() {
-    this.progressInterval = setInterval(async () => {
-      if (this.playerInstance && this.deviceId) {
-        if (this.playerInstance.getCurrentState) {
-          const state = await this.playerInstance.getCurrentState();
-          if (state) {
-            const sdkTrackUri = state.track_window?.current_track?.uri;
-            if (sdkTrackUri === this.trackUri) {
-              this.currentPosition = state.position;
-              this.duration = state.duration;
-              this.isPlaying = !state.paused;
-              this.loading = false;
-            } else {
-              // SDK is not yet on the correct track, show loading
-              this.currentPosition = 0;
-              this.duration = 0;
-              this.loading = true;
-            }
-            // If track ended, go to next
-            if (state.position >= state.duration && !state.paused) {
-              this.playerService.nextTrack();
-            }
-          } else {
-            this.isPlaying = false;
-            this.loading = true;
-          }
-        }
-      }
-    }, 1000);
-  }
-
-  async onSeek(event: any) {
-    const value = event.detail.value;
-    if (this.playerInstance && this.playerInstance.seek) {
-      await this.playerInstance.seek(value);
-      this.currentPosition = value;
-    } else if (this.deviceId) {
-      await this.spotifyService.seekToPosition(value, this.deviceId);
-      this.currentPosition = value;
+    if (this.playerInstance) {
+      this.playerInstance.disconnect();
     }
   }
 
-  async fetchTrackInfo() {
-    if (this.trackUri) {
-      const track = await this.spotifyService.getTrackInfo(this.trackUri);
-      this.trackName = track.name;
-      this.trackArtist = track.artists[0]?.name;
-      this.trackImage = track.album.images[0]?.url;
+  async syncPlayerState() {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    if (!accessToken) return;
+    const headers = new Headers({ Authorization: `Bearer ${accessToken}` });
+
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me/player', { headers });
+      if (!response.ok) return;
+      const data = await response.json();
+      this.shuffle = !!data.shuffle_state;
+      this.repeatMode = data.repeat_state as 'off' | 'context' | 'track';
+    } catch (err) {
+      // Optionally handle error
     }
   }
 
@@ -200,67 +92,170 @@ export class PlayerComponent implements OnInit, OnChanges, OnDestroy {
     player.addListener('ready', (e: any) => {
       this.deviceId = e.device_id;
       if (this.deviceId) {
+        localStorage.setItem('spotifyDeviceId', this.deviceId);
         this.spotifyService.transferPlayback(this.deviceId);
         this.startProgressUpdater();
+        this.syncPlayerState(); // <-- Sync shuffle/repeat state on ready
       }
+    });
+
+    player.addListener('player_state_changed', (state: any) => {
+      if (!state) return;
+      this.state = state;
+      const track = state.track_window.current_track;
+      this.trackName = track?.name || '';
+      this.trackArtist = track?.artists?.[0]?.name || '';
+      this.trackImage = track?.album?.images?.[0]?.url || '';
+      this.currentPosition = state.position;
+      this.duration = state.duration;
+      this.isPlaying = !state.paused;
+      this.loading = false;
+
+      // Queue and thumbs
+      const prev = state.track_window.previous_tracks;
+      const next = state.track_window.next_tracks;
+      this.previousTrack = prev && prev.length ? prev[prev.length - 1] : null;
+      this.nextTrack = next && next.length ? next[0] : null;
+      this.queue = [
+        ...(prev || []),
+        track,
+        ...(next || [])
+      ];
     });
 
     player.connect();
   }
 
-  async play() {
-    if (this.trackUri && this.deviceId) {
-      await this.spotifyService.transferPlayback(this.deviceId);
+  getTrackImage(track: any): string {
+    return track?.album?.images?.[0]?.url || '';
+  }
+  getTrackName(track: any): string {
+    return track?.name || '';
+  }
+  getTrackArtist(track: any): string {
+    return track?.artists?.[0]?.name || '';
+  }
 
-      // Always fetch the current state from the SDK
-      let state = null;
-      if (this.playerInstance && this.playerInstance.getCurrentState) {
-        state = await this.playerInstance.getCurrentState();
+  startProgressUpdater() {
+    this.progressInterval = setInterval(async () => {
+      if (this.playerInstance && this.deviceId) {
+        if (this.playerInstance.getCurrentState) {
+          const state = await this.playerInstance.getCurrentState();
+          if (state) {
+            this.currentPosition = state.position;
+            this.duration = state.duration;
+            this.isPlaying = !state.paused;
+            this.loading = false;
+          } else {
+            this.isPlaying = false;
+            this.loading = true;
+          }
+        }
       }
+    }, 1000);
+  }
 
-      // Check if the SDK is already on the correct track and paused
-      const sdkTrackUri = state?.track_window?.current_track?.uri;
-      const isPaused = state?.paused;
+  openModal() {
+    this.showModal = true;
+  }
 
-      if (sdkTrackUri === this.trackUri && isPaused) {
-        await this.resume();
+  closeModal() {
+    this.showModal = false;
+  }
+
+  onModalWillDismiss(event: any) {
+    this.showModal = false;
+  }
+
+  async openQueueModal() {
+    this.showQueueModal = true;
+    try {
+      const queueData = await this.spotifyService.getPlaybackQueue();
+      this.queue = [
+        queueData.currently_playing,
+        ...(queueData.queue || [])
+      ];
+    } catch (e) {
+      // Fallback to SDK window
+      await this.presentToast('Could not load full queue. Showing limited queue.', 'warning');
+      if (this.state) {
+        const prev = this.state.track_window.previous_tracks;
+        const track = this.state.track_window.current_track;
+        const next = this.state.track_window.next_tracks;
+        this.queue = [
+          ...(prev || []),
+          track,
+          ...(next || [])
+        ];
       } else {
-        await this.spotifyService.playTrack(this.trackUri, this.deviceId);
-        this.currentLoadedTrackUri = this.trackUri;
-        this.isPlaying = true;
-        this.currentPosition = 0; // Reset progress
+        this.queue = [];
       }
     }
   }
 
-  async pause() {
-    await this.spotifyService.pausePlayback();
-    this.isPlaying = false;
+  async presentToast(message: string, color: 'success' | 'warning' | 'danger' = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
-  async resume() {
-    await this.spotifyService.resumePlayback();
-    this.isPlaying = true;
+  closeQueueModal() {
+    this.showQueueModal = false;
+  }
+
+  async play() {
+    if (this.playerInstance) {
+      await this.playerInstance.resume();
+    }
+  }
+
+  async pause() {
+    if (this.playerInstance) {
+      await this.playerInstance.pause();
+    }
   }
 
   async next() {
-    await this.playerService.nextTrack();
-    this.currentPosition = 0;
-    this.duration = 0;
-    this.loading = true;
-    await this.play();
+    if (this.playerInstance) {
+      await this.playerInstance.nextTrack();
+    }
   }
 
   async previous() {
-    await this.playerService.previousTrack();
-    this.currentPosition = 0;
-    this.duration = 0;
-    this.loading = true;
-    await this.play();
+    if (this.playerInstance) {
+      await this.playerInstance.previousTrack();
+    }
   }
 
-  toggleShuffle() {
-    this.playerService.toggleShuffle();
-    this.shuffle = this.playerService.shuffle;
+  async onSeek(event: any) {
+    const value = event.detail.value;
+    if (this.playerInstance && this.playerInstance.seek) {
+      await this.playerInstance.seek(value);
+      this.currentPosition = value;
+    }
+  }
+
+  async toggleShuffle() {
+    if (this.deviceId) {
+      this.shuffle = !this.shuffle;
+      await this.spotifyService.setShuffle(this.shuffle, this.deviceId);
+    }
+  }
+
+  async toggleRepeat() {
+    if (this.deviceId) {
+      if (this.repeatMode === 'off') {
+        this.repeatMode = 'context';
+      } else if (this.repeatMode === 'context') {
+        this.repeatMode = 'track';
+      } else {
+        this.repeatMode = 'off';
+      }
+      await this.spotifyService.setRepeat(this.repeatMode, this.deviceId);
+    }
   }
 }

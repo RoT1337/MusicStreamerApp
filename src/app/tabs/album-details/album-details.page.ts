@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PlayerService } from 'src/app/services/player.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
 import { Location } from '@angular/common';
 import { ToastController } from '@ionic/angular';
@@ -29,7 +28,6 @@ export class AlbumDetailsPage implements OnInit {
   constructor(
     private route: ActivatedRoute, 
     private spotifyService: SpotifyService,
-    private playerService: PlayerService,
     private location: Location,
     private toastController: ToastController
   ) {}
@@ -56,14 +54,30 @@ export class AlbumDetailsPage implements OnInit {
   async playAlbum() {
     if (!this.tracks?.length) return;
     const uris = this.tracks.map(track => track.uri);
-    await this.playerService.setQueue(uris);
-    // await this.playerService.setTrackUri(uris[0]);
+    const deviceId = localStorage.getItem('spotifyDeviceId');
+    if (!deviceId) {
+      this.presentToast('No active device found.', 'danger');
+      return;
+    }
+    await this.spotifyService.playUris(uris, deviceId);
   }
 
   async playTrack(trackUri: string) {
-    await this.playerService.setQueue([trackUri]);
-    await this.playerService.setTrackUri(trackUri);
-    await this.playerService.addTopTracksToQueue(trackUri);
+    const deviceId = localStorage.getItem('spotifyDeviceId');
+    if (!deviceId) {
+      this.presentToast('No active device found.', 'danger');
+      return;
+    }
+    // Use album tracks as the queue
+    const uris = this.tracks.map(track => track.uri);
+    const startIndex = uris.indexOf(trackUri);
+    let playUris: string[] = [];
+    if (startIndex > -1) {
+      playUris = uris.slice(startIndex).concat(uris.slice(0, startIndex));
+    } else {
+      playUris = [trackUri];
+    }
+    await this.spotifyService.playUris(playUris, deviceId);
   }
 
   openTrackOptions(track: any) {
@@ -138,12 +152,14 @@ export class AlbumDetailsPage implements OnInit {
 
   async shuffleAlbum() {
     if (!this.tracks?.length) return;
-    // Enable shuffle in the player service
-    if (!this.playerService.shuffle) {
-      this.playerService.toggleShuffle();
-    }
     const uris = this.tracks.map(track => track.uri);
-    await this.playerService.setQueue(uris);
+    const deviceId = localStorage.getItem('spotifyDeviceId');
+    if (!deviceId) {
+      this.presentToast('No active device found.', 'danger');
+      return;
+    }
+    await this.spotifyService.setShuffle(true, deviceId);
+    await this.spotifyService.playUris(uris, deviceId);
   }
 
   openAlbumOptions() {

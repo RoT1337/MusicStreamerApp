@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router'; // <-- Add this import
+import { Router } from '@angular/router';
 import { SpotifyService } from 'src/app/services/spotify.service';
-import { PlayerService } from 'src/app/services/player.service';
 
 @Component({
   selector: 'app-new-releases',
@@ -21,8 +20,7 @@ export class NewReleasesComponent implements OnInit {
 
   constructor(
     private spotifyService: SpotifyService,
-    private playerService: PlayerService,
-    private router: Router // <-- Inject router here
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -33,9 +31,9 @@ export class NewReleasesComponent implements OnInit {
   }
 
   async playSong(uri: string) {
-    await this.playerService.setQueue([uri]);
-    await this.playerService.setTrackUri(uri);
-    await this.playerService.addTopTracksToQueue(uri);
+    const deviceId = localStorage.getItem('spotifyDeviceId');
+    if (!deviceId) return;
+    await this.spotifyService.playUris([uri], deviceId);
   }
 
   openAddToPlaylistModal(trackUri: string) {
@@ -66,7 +64,6 @@ export class NewReleasesComponent implements OnInit {
     this.closeAddToPlaylistModal();
   }
 
-  // --- Add this method for navigation ---
   openAlbum(albumId: string) {
     this.router.navigate(['/tabs/album', albumId]);
   }

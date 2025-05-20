@@ -4,7 +4,6 @@ import { App } from '@capacitor/app';
 import { SpotifyService } from './services/spotify.service';
 import { Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
-import { PlayerService } from './services/player.service';
 
 register();
 
@@ -20,13 +19,9 @@ export class AppComponent {
 
   constructor(
     private spotifyService: SpotifyService, 
-    private router: Router,
-    private playerService: PlayerService
+    private router: Router
   ) {
-    // Set initial login state
     this.isLoggedIn = !!localStorage.getItem('spotifyAccessToken');
-
-    playerService.trackUri$.subscribe(uri => this.selectedTrackUri = uri);
 
     App.addListener('appUrlOpen', async (data: any) => {
       if (data.url && data.url.startsWith('beam://callback')) {
@@ -35,7 +30,7 @@ export class AppComponent {
         if (code) {
           try {
             await spotifyService.exchangeCodeForToken(code);
-            this.isLoggedIn = true; // Update login state after login
+            this.isLoggedIn = true;
             this.router.navigate(['/tabs/home']);
           } catch (err) {
             console.error('Token exchange failed', err);
@@ -47,6 +42,6 @@ export class AppComponent {
   }
 
   shouldShowPlayer(): boolean {
-    return this.isLoggedIn && !!this.selectedTrackUri && !this.router.url.startsWith('/start');
+    return this.isLoggedIn && !this.router.url.startsWith('/start');
   }
 }

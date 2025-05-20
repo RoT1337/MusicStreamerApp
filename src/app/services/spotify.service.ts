@@ -353,6 +353,33 @@ export class SpotifyService {
     );
   }
 
+  async playUris(uris: string[], deviceId: string) {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    });
+    await firstValueFrom(
+      this.http.put(
+        `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+        { uris },
+        { headers }
+      )
+    );
+  }
+
+  async setRepeat(mode: 'off' | 'track' | 'context', deviceId: string) {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    let url = `https://api.spotify.com/v1/me/player/repeat?state=${mode}`;
+    if (deviceId) {
+      url += `&device_id=${deviceId}`;
+    }
+    await firstValueFrom(
+      this.http.put(url, {}, { headers, responseType: 'text' })
+    );
+  }
+
   async createPlaylist(name: string, description: string = ''): Promise<any> {
     const accessToken = localStorage.getItem('spotifyAccessToken');
     if (!accessToken) {
@@ -429,5 +456,13 @@ export class SpotifyService {
       this.http.get(`https://api.spotify.com/v1/recommendations?${params.toString()}`, { headers })
     );
     return response.tracks;
+  }
+
+  async getPlaybackQueue(): Promise<any> {
+    const accessToken = localStorage.getItem('spotifyAccessToken');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
+    return firstValueFrom(
+      this.http.get('https://api.spotify.com/v1/me/player/queue', { headers })
+    );
   }
 }

@@ -17,7 +17,7 @@
   </div>
 </ion-header>
 
-<ion-content [fullscreen]="true" [class.has-player]="selectedTrackUri | async">
+<ion-content [fullscreen]="true" [class.has-player]="!!selectedTrackUri">
   
   <div class="body ion-padding">
     <!-- Quick picks portion -->

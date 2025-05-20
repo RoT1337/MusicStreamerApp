@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { SpotifyService } from 'src/app/services/spotify.service';
-import { PlayerService } from 'src/app/services/player.service';
 
 @Component({
   selector: 'app-top-songs',
@@ -18,10 +17,7 @@ export class TopSongsComponent implements OnInit {
   selectedPlaylistsToAdd: Set<string> = new Set();
   userPlaylists: any[] = [];
 
-  constructor(
-    private spotifyService: SpotifyService,
-    private playerService: PlayerService
-  ) {}
+  constructor(private spotifyService: SpotifyService) {}
 
   async ngOnInit() {
     this.isLoading = true;
@@ -31,9 +27,18 @@ export class TopSongsComponent implements OnInit {
   }
 
   async playSong(uri: string) {
-    await this.playerService.setQueue([uri]);
-    await this.playerService.setTrackUri(uri);
-    await this.playerService.addTopTracksToQueue(uri);
+    const deviceId = localStorage.getItem('spotifyDeviceId');
+    if (!deviceId) return;
+    // Use top songs as the queue
+    const uris = this.tracks.map(track => track.uri);
+    const startIndex = uris.indexOf(uri);
+    let playUris: string[] = [];
+    if (startIndex > -1) {
+      playUris = uris.slice(startIndex).concat(uris.slice(0, startIndex));
+    } else {
+      playUris = [uri];
+    }
+    await this.spotifyService.playUris(playUris, deviceId);
   }
 
   openAddToPlaylistModal(trackUri: string) {
