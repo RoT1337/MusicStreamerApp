@@ -19,10 +19,16 @@ export class StartPage implements OnInit {
     const isLoggedIn = !!localStorage.getItem('spotifyAccessToken');
     if (isLoggedIn) {
       this.router.navigate(['/tabs/home']);
+    } else if (!navigator.onLine) {
+      this.router.navigate(['/tabs/local-music']);
     }
   }
 
   login() {
     this.spotifyService.login();
+  }
+
+  continueWithoutSpotify() {
+    this.router.navigate(['/tabs/local-music']);
   }
 }

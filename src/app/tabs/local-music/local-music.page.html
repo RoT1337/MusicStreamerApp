@@ -1,0 +1,37 @@
+<ion-header [translucent]="true">
+  <ion-toolbar style="padding-top: 25px;">
+    <ion-title>Local Music</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <input type="file" accept="audio/*" multiple (change)="onFilesSelected($event)" hidden #fileInput>
+  <ion-button expand="block" (click)="fileInput.click()">Add Tracks</ion-button>
+
+  <ion-list>
+    <ion-item *ngFor="let playlist of playlists; let i = index">
+      <ion-label>
+        <h2>{{ playlist.name }}</h2>
+        <p>{{ playlist.tracks.length }} tracks</p>
+      </ion-label>
+      <ion-button fill="clear" (click)="shuffle(i)">
+        <ion-icon name="shuffle-outline"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="selectPlaylist(i)">
+        <ion-icon name="play-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="addPlaylist()">Add Playlist</ion-button>
+
+  <div *ngIf="selectedPlaylist">
+    <h3>{{ selectedPlaylist.name }}</h3>
+    <ion-list>
+      <ion-item *ngFor="let track of selectedPlaylist.tracks; let ti = index" (click)="playTrack(ti)">
+        <ion-label>{{ track.name }}</ion-label>
+      </ion-item>
+    </ion-list>
+    <app-local-player *ngIf="currentTrack" [track]="currentTrack" [queue]="selectedPlaylist.tracks" [queueIndex]="currentTrackIndex"></app-local-player>
+  </div>
+</ion-content>

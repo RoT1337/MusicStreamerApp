@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { PreferencesService } from './preferences.service';
+import { LocalAudioService } from './local-audio.service';
 
-describe('PreferencesService', () => {
-  let service: PreferencesService;
+describe('LocalAudioService', () => {
+  let service: LocalAudioService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(PreferencesService);
+    service = TestBed.inject(LocalAudioService);
   });
 
   it('should be created', () => {
